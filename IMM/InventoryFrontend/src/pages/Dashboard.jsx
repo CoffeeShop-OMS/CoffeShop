@@ -1,4 +1,7 @@
 import React from 'react';
+
+import { Link, useNavigate } from 'react-router-dom';
+
 import { 
   Coffee, LayoutDashboard, Package, Truck, BarChart2, 
   Settings, LogOut, Search, Bell, Calendar, Plus, 
@@ -6,8 +9,17 @@ import {
   PlusCircle, Trash2, ShoppingCart, RefreshCw, ArrowUpRight
 } from 'lucide-react';
 
-export default function Dashboard() {
+export default function Dashboard({ setIsAuthenticated }) {
+  const navigate = useNavigate();
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    setIsAuthenticated(false); // Ilo-lock ulit natin ang system
+    navigate('/login'); // Ibabalik ka sa Login page
+  };
+
   return (
+    // ... (tuloy-tuloy lang ang dating code dito)
     <div className="flex h-screen bg-[#FBFBFA] font-sans overflow-hidden">
       
       {/* ================= SIDEBAR ================= */}
@@ -22,36 +34,36 @@ export default function Dashboard() {
           </div>
 
           {/* Navigation */}
-          <nav className="p-4 space-y-1">
-            <a href="#" className="flex items-center gap-3 px-4 py-3 bg-[#3D261D] text-white rounded-lg font-medium shadow-md">
-              <LayoutDashboard className="w-5 h-5" />
-              Dashboard
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">
-              <Package className="w-5 h-5" />
-              Inventory
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">
-              <Truck className="w-5 h-5" />
-              Suppliers
-            </a>
-            <a href="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">
-              <BarChart2 className="w-5 h-5" />
-              Reports
-            </a>
-          </nav>
+        
+       <nav className="p-4 space-y-1">
+         <Link to="/dashboard" className="flex items-center gap-3 px-4 py-3 bg-[#3D261D] text-white rounded-lg font-medium shadow-md">
+           <LayoutDashboard className="w-5 h-5" /> Dashboard
+         </Link>
+         <Link to="/inventory" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">
+           <Package className="w-5 h-5" /> Inventory
+         </Link>
+         
+         <a href="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">
+           <Truck className="w-5 h-5" /> Suppliers
+         </a>
+        <Link to="/reports" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">
+  <BarChart2 className="w-5 h-5" /> 
+  Reports
+</Link>
+       </nav>
         </div>
 
-        {/* Bottom Actions */}
+       {/* Bottom Actions */}
         <div className="p-4 space-y-1 border-t border-gray-200">
           <a href="#" className="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-lg font-medium transition-colors">
-            <Settings className="w-5 h-5" />
-            Settings
+            <Settings className="w-5 h-5" /> Settings
           </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
-            <LogOut className="w-5 h-5" />
-            Logout
-          </a>
+          
+          {/* ITO YUNG PAPALITAN MO PARA TAWAGIN ANG LOGOUT FUNCTION: */}
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors">
+            <LogOut className="w-5 h-5" /> Logout
+          </button>
+          
         </div>
       </aside>
 
