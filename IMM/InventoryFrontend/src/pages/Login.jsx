@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; /* <-- BAGONG IMPORT PARA LUMIPAT NG PAGE */
 import { Coffee, Mail, Lock, Eye, EyeOff, ArrowRight, Leaf, Bean } from 'lucide-react';
 
