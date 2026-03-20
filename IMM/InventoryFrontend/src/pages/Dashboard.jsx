@@ -1,5 +1,4 @@
 import {
- 
   Coffee, Package, Calendar, Plus, 
   DollarSign, AlertTriangle, TrendingUp, TrendingDown,
   PlusCircle, Trash2, ShoppingCart, RefreshCw, ArrowUpRight
@@ -7,20 +6,20 @@ import {
 
 export default function Dashboard({ setIsAuthenticated }) {
   return (
-    <div className="w-full p-8">
+    <div className="w-full p-4 md:p-8">
           
           {/* Welcome Section */}
-          <div className="flex justify-between items-end mb-8">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 font-serif mb-1">Morning, Arabica Manager</h1>
-              <p className="text-gray-500 text-sm">Your inventory health is <span className="font-semibold text-gray-700">92%</span>. 4 items need your attention.</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 font-serif mb-1">Morning, Arabica Manager</h1>
+              <p className="text-gray-500 text-xs md:text-sm">Your inventory health is <span className="font-semibold text-gray-700">92%</span>. 4 items need your attention.</p>
             </div>
-            <div className="flex gap-3">
-              <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <button className="flex items-center justify-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors w-full sm:w-auto">
                 <Calendar className="w-4 h-4" />
                 Jun 12, 2024
               </button>
-              <button className="flex items-center gap-2 bg-[#3D261D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2A1A14] transition-colors">
+              <button className="flex items-center justify-center gap-2 bg-[#3D261D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2A1A14] transition-colors w-full sm:w-auto">
                 <Plus className="w-4 h-4" />
                 Add Entry
               </button>
@@ -28,49 +27,49 @@ export default function Dashboard({ setIsAuthenticated }) {
           </div>
 
           {/* Top Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
               <div className="flex justify-between items-start">
                 <div className="p-2 bg-gray-50 rounded-lg">
                   <Package className="w-5 h-5 text-gray-600" />
                 </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-md">
+                <div className="flex items-center gap-1 text-[10px] md:text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-md">
                   <TrendingUp className="w-3 h-3" /> +12% from last week
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Total Inventory Items</p>
-                <p className="text-2xl font-bold font-serif text-gray-900">1,284</p>
+                <p className="text-[10px] md:text-xs text-gray-500 mb-1">Total Inventory Items</p>
+                <p className="text-xl md:text-2xl font-bold font-serif text-gray-900">1,284</p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
               <div className="flex justify-between items-start">
                 <div className="p-2 bg-gray-50 rounded-lg">
                   <DollarSign className="w-5 h-5 text-gray-600" />
                 </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-md">
+                <div className="flex items-center gap-1 text-[10px] md:text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-md">
                   <TrendingUp className="w-3 h-3" /> +3.4% vs last month
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Current Value (USD)</p>
-                <p className="text-2xl font-bold font-serif text-gray-900">$24,580.00</p>
+                <p className="text-[10px] md:text-xs text-gray-500 mb-1">Current Value (USD)</p>
+                <p className="text-xl md:text-2xl font-bold font-serif text-gray-900">$24,580.00</p>
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
               <div className="flex justify-between items-start">
                 <div className="p-2 bg-gray-50 rounded-lg">
                   <AlertTriangle className="w-5 h-5 text-gray-600" />
                 </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded-md">
+                <div className="flex items-center gap-1 text-[10px] md:text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded-md">
                   <TrendingDown className="w-3 h-3" /> -2 since yesterday
                 </div>
               </div>
               <div>
-                <p className="text-xs text-gray-500 mb-1">Low Stock Items</p>
-                <p className="text-2xl font-bold font-serif text-gray-900">14</p>
+                <p className="text-[10px] md:text-xs text-gray-500 mb-1">Low Stock Items</p>
+                <p className="text-xl md:text-2xl font-bold font-serif text-gray-900">14</p>
               </div>
             </div>
           </div>
@@ -79,13 +78,13 @@ export default function Dashboard({ setIsAuthenticated }) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             
             {/* Big Graph - Daily Ingredient Usage */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm lg:col-span-2 relative">
-              <div className="flex justify-between items-start mb-6">
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm lg:col-span-2 relative">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
                 <div>
-                  <h3 className="font-bold text-gray-900">Daily Ingredient Usage</h3>
-                  <p className="text-xs text-gray-500">Volume of key ingredients consumed past 7 days</p>
+                  <h3 className="font-bold text-gray-900 text-sm md:text-base">Daily Ingredient Usage</h3>
+                  <p className="text-[10px] md:text-xs text-gray-500">Volume of key ingredients consumed past 7 days</p>
                 </div>
-                <div className="flex bg-gray-100 rounded-lg p-1">
+                <div className="flex bg-gray-100 rounded-lg p-1 self-start">
                   <button className="px-3 py-1 bg-white rounded-md text-xs font-bold shadow-sm text-gray-800">Espresso</button>
                   <button className="px-3 py-1 text-xs font-bold text-gray-500">Milk</button>
                 </div>
@@ -97,7 +96,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                   <span>24</span><span>18</span><span>12</span><span>6</span><span>0</span>
                 </div>
                 {/* X-Axis labels */}
-                <div className="absolute bottom-0 left-6 right-0 flex justify-between text-[10px] text-gray-400">
+                <div className="absolute bottom-0 left-6 right-0 flex justify-between text-[10px] text-gray-400 overflow-hidden">
                   <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                 </div>
                 {/* Dotted lines */}
@@ -123,49 +122,49 @@ export default function Dashboard({ setIsAuthenticated }) {
             </div>
 
             {/* Priority Alerts */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                  <h3 className="font-bold text-gray-900 flex items-center gap-2 text-sm md:text-base">
                     <AlertTriangle className="w-4 h-4 text-gray-500" /> Priority Alerts
                   </h3>
-                  <p className="text-xs text-gray-500">Items below threshold as of today</p>
+                  <p className="text-[10px] md:text-xs text-gray-500">Items below threshold as of today</p>
                 </div>
-                <a href="#" className="text-xs text-gray-600 hover:text-gray-900">View All</a>
+                <a href="#" className="text-[10px] md:text-xs text-gray-600 hover:text-gray-900">View All</a>
               </div>
               
               <div className="flex-1 space-y-3">
                 {/* Alert 1 */}
                 <div className="p-3 border border-gray-100 rounded-xl flex justify-between items-center">
                   <div>
-                    <p className="font-bold text-sm text-gray-900">Ethiopian Yirgacheffe</p>
+                    <p className="font-bold text-xs md:text-sm text-gray-900">Ethiopian Yirgacheffe</p>
                     <p className="text-[10px] text-gray-500">Current: 1.2kg / Reorder: 2.0kg</p>
                   </div>
-                  <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">critical</span>
+                  <span className="bg-red-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-full">critical</span>
                 </div>
                 {/* Alert 2 */}
                 <div className="p-3 border border-gray-100 rounded-xl flex justify-between items-center">
                   <div>
-                    <p className="font-bold text-sm text-gray-900">Oat Milk (Barista Ed.)</p>
+                    <p className="font-bold text-xs md:text-sm text-gray-900">Oat Milk (Barista Ed.)</p>
                     <p className="text-[10px] text-gray-500">Current: 8L / Reorder: 12L</p>
                   </div>
-                  <span className="border border-gray-300 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full">warning</span>
+                  <span className="border border-gray-300 text-gray-600 text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-full">warning</span>
                 </div>
                 {/* Alert 3 */}
                 <div className="p-3 border border-gray-100 rounded-xl flex justify-between items-center">
                   <div>
-                    <p className="font-bold text-sm text-gray-900">Caramel Syrup</p>
+                    <p className="font-bold text-xs md:text-sm text-gray-900">Caramel Syrup</p>
                     <p className="text-[10px] text-gray-500">Current: 2 bottles / Reorder: 5 bottles</p>
                   </div>
-                  <span className="border border-gray-300 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full">warning</span>
+                  <span className="border border-gray-300 text-gray-600 text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-full">warning</span>
                 </div>
                 {/* Alert 4 */}
                 <div className="p-3 border border-gray-100 rounded-xl flex justify-between items-center">
                   <div>
-                    <p className="font-bold text-sm text-gray-900">Paper Cups (12oz)</p>
+                    <p className="font-bold text-xs md:text-sm text-gray-900">Paper Cups (12oz)</p>
                     <p className="text-[10px] text-gray-500">Current: 150 pcs / Reorder: 500 pcs</p>
                   </div>
-                  <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">critical</span>
+                  <span className="bg-red-500 text-white text-[9px] md:text-[10px] font-bold px-2 py-0.5 rounded-full">critical</span>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
@@ -179,9 +178,9 @@ export default function Dashboard({ setIsAuthenticated }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             
             {/* Stock Distribution */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-1">Stock Distribution</h3>
-              <p className="text-xs text-gray-500 mb-6">Capacity usage by category</p>
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm">
+              <h3 className="font-bold text-gray-900 mb-1 text-sm md:text-base">Stock Distribution</h3>
+              <p className="text-[10px] md:text-xs text-gray-500 mb-6">Capacity usage by category</p>
               
               <div className="space-y-4 mb-6">
                 <div>
@@ -206,16 +205,16 @@ export default function Dashboard({ setIsAuthenticated }) {
                 </div>
               </div>
               <div className="flex justify-between border-t border-gray-100 pt-4 text-center">
-                <div><p className="text-[10px] text-gray-400">Beans</p><p className="font-bold text-gray-900">45%</p></div>
-                <div><p className="text-[10px] text-gray-400">Dairy</p><p className="font-bold text-gray-900">82%</p></div>
-                <div><p className="text-[10px] text-gray-400">Syrup</p><p className="font-bold text-gray-900">35%</p></div>
+                <div><p className="text-[10px] text-gray-400">Beans</p><p className="font-bold text-xs md:text-sm text-gray-900">45%</p></div>
+                <div><p className="text-[10px] text-gray-400">Dairy</p><p className="font-bold text-xs md:text-sm text-gray-900">82%</p></div>
+                <div><p className="text-[10px] text-gray-400">Syrup</p><p className="font-bold text-xs md:text-sm text-gray-900">35%</p></div>
               </div>
             </div>
 
             {/* Inventory Trends */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm relative">
-              <h3 className="font-bold text-gray-900 mb-1">Inventory Trends</h3>
-              <p className="text-xs text-gray-500 mb-6">Total monthly inventory valuation</p>
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm relative">
+              <h3 className="font-bold text-gray-900 mb-1 text-sm md:text-base">Inventory Trends</h3>
+              <p className="text-[10px] md:text-xs text-gray-500 mb-6">Total monthly inventory valuation</p>
               
               <div className="h-40 w-full relative mb-4">
                  {/* Dotted lines */}
@@ -241,8 +240,8 @@ export default function Dashboard({ setIsAuthenticated }) {
                 </div>
               </div>
               
-              <div className="bg-[#FAF8F5] p-3 rounded-lg flex items-center gap-3">
-                <div className="bg-[#4A332A] p-1.5 rounded text-white">
+              <div className="bg-[#FAF8F5] p-3 rounded-lg flex items-center gap-3 mt-4">
+                <div className="bg-[#4A332A] p-1.5 rounded text-white flex-shrink-0">
                    <TrendingUp className="w-4 h-4" />
                 </div>
                 <div>
@@ -253,9 +252,9 @@ export default function Dashboard({ setIsAuthenticated }) {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
-              <h3 className="font-bold text-gray-900 mb-1">Recent Activity</h3>
-              <p className="text-xs text-gray-500 mb-6">Live operational logs</p>
+            <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+              <h3 className="font-bold text-gray-900 mb-1 text-sm md:text-base">Recent Activity</h3>
+              <p className="text-[10px] md:text-xs text-gray-500 mb-6">Live operational logs</p>
               
               <div className="flex-1 relative">
                 {/* Vertical Line */}
@@ -263,37 +262,37 @@ export default function Dashboard({ setIsAuthenticated }) {
                 
                 <div className="space-y-5 relative z-10">
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center bg-white"><PlusCircle className="w-3 h-3 text-gray-600" /></div>
+                    <div className="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center bg-white flex-shrink-0"><PlusCircle className="w-3 h-3 text-gray-600" /></div>
                     <div>
-                      <p className="text-xs font-bold text-gray-900">Stock Added <span className="font-normal text-[10px] text-gray-400 ml-1">08:15 AM</span></p>
-                      <p className="text-xs text-gray-600">20kg Brazilian Santos</p>
+                      <p className="text-xs font-bold text-gray-900">Stock Added <span className="font-normal text-[9px] md:text-[10px] text-gray-400 ml-1">08:15 AM</span></p>
+                      <p className="text-[11px] md:text-xs text-gray-600">20kg Brazilian Santos</p>
                       <p className="text-[10px] text-gray-400 italic">— Marco B.</p>
                     </div>
                   </div>
                   
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center bg-white"><Trash2 className="w-3 h-3 text-red-400" /></div>
+                    <div className="w-6 h-6 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center flex-shrink-0"><Trash2 className="w-3 h-3 text-red-400" /></div>
                     <div>
-                      <p className="text-xs font-bold text-gray-900">Waste Logged <span className="font-normal text-[10px] text-gray-400 ml-1">10:30 AM</span></p>
-                      <p className="text-xs text-gray-600">450ml Whole Milk (Exp.)</p>
+                      <p className="text-xs font-bold text-gray-900">Waste Logged <span className="font-normal text-[9px] md:text-[10px] text-gray-400 ml-1">10:30 AM</span></p>
+                      <p className="text-[11px] md:text-xs text-gray-600">450ml Whole Milk (Exp.)</p>
                       <p className="text-[10px] text-gray-400 italic">— Sarah K.</p>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center bg-white"><ShoppingCart className="w-3 h-3 text-gray-600" /></div>
+                    <div className="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center bg-white flex-shrink-0"><ShoppingCart className="w-3 h-3 text-gray-600" /></div>
                     <div>
-                      <p className="text-xs font-bold text-gray-900">Order Placed <span className="font-normal text-[10px] text-gray-400 ml-1">11:45 AM</span></p>
-                      <p className="text-xs text-gray-600">Weekly Dairy Supply</p>
+                      <p className="text-xs font-bold text-gray-900">Order Placed <span className="font-normal text-[9px] md:text-[10px] text-gray-400 ml-1">11:45 AM</span></p>
+                      <p className="text-[11px] md:text-xs text-gray-600">Weekly Dairy Supply</p>
                       <p className="text-[10px] text-gray-400 italic">— System</p>
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center bg-white"><RefreshCw className="w-3 h-3 text-gray-600" /></div>
+                    <div className="w-6 h-6 rounded-full border-2 border-gray-200 flex items-center justify-center bg-white flex-shrink-0"><RefreshCw className="w-3 h-3 text-gray-600" /></div>
                     <div>
-                      <p className="text-xs font-bold text-gray-900">Stock Update <span className="font-normal text-[10px] text-gray-400 ml-1">02:20 PM</span></p>
-                      <p className="text-xs text-gray-600">Pastry inventory sync</p>
+                      <p className="text-xs font-bold text-gray-900">Stock Update <span className="font-normal text-[9px] md:text-[10px] text-gray-400 ml-1">02:20 PM</span></p>
+                      <p className="text-[11px] md:text-xs text-gray-600">Pastry inventory sync</p>
                       <p className="text-[10px] text-gray-400 italic">— InventoryBot</p>
                     </div>
                   </div>
@@ -304,19 +303,19 @@ export default function Dashboard({ setIsAuthenticated }) {
           </div>
 
           {/* Restock Banner */}
-          <div className="bg-[#FAF6F4] rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between border border-[#F0EBE6]">
+          <div className="bg-[#FAF6F4] rounded-2xl p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between border border-[#F0EBE6]">
             <div className="flex items-center gap-4 mb-4 md:mb-0">
-              <div className="bg-[#3D261D] p-3 rounded-xl">
+              <div className="bg-[#3D261D] p-3 rounded-xl flex-shrink-0">
                 <Coffee className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg font-serif">Need a restock fast?</h3>
-                <p className="text-sm text-gray-600">Quick-order from your top 3 suppliers in one click.</p>
+                <h3 className="font-bold text-gray-900 text-base md:text-lg font-serif">Need a restock fast?</h3>
+                <p className="text-xs md:text-sm text-gray-600">Quick-order from your top 3 suppliers in one click.</p>
               </div>
             </div>
-            <div className="flex gap-3">
-              <button className="bg-white border border-gray-200 text-gray-800 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors">Supplier Portal</button>
-              <button className="bg-[#3D261D] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2A1A14] transition-colors">Create Bulk PO</button>
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <button className="bg-white border border-gray-200 text-gray-800 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors w-full sm:w-auto text-center">Supplier Portal</button>
+              <button className="bg-[#3D261D] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2A1A14] transition-colors w-full sm:w-auto text-center">Create Bulk PO</button>
             </div>
           </div>
 

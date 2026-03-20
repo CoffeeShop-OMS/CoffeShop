@@ -197,66 +197,68 @@ export default function Inventory() {
         .inv-root { font-family: 'DM Sans', sans-serif; background: #FAF8F5; min-height: 100vh; }
         .inv-heading { font-family: 'Playfair Display', serif; }
 
+        /* RESPONSIVE PADDING PARA SA BUONG PAGE */
+        .inv-container { padding: 16px; width: 100%; box-sizing: border-box; }
+        @media (min-width: 768px) { .inv-container { padding: 36px 40px; } }
+
+        /* RESPONSIVE HEADER AT BUTTONS */
+        .page-header { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+        .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .header-actions button { flex: 1; justify-content: center; }
+        @media (min-width: 640px) {
+          .page-header { flex-direction: row; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; }
+          .header-actions button { flex: none; }
+        }
+
+        /* RESPONSIVE STATS CARDS GRID */
+        .stats-grid { display: grid; gap: 16px; margin-bottom: 24px; grid-template-columns: 1fr; }
+        @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (min-width: 1024px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; margin-bottom: 28px; } }
+
         .stat-card {
-          background: #fff;
-          border-radius: 20px;
-          padding: 24px;
-          border: 1px solid #EEEBE6;
-          transition: box-shadow 0.2s, transform 0.2s;
-          position: relative;
-          overflow: hidden;
+          background: #fff; border-radius: 20px; padding: 24px;
+          border: 1px solid #EEEBE6; transition: box-shadow 0.2s, transform 0.2s;
+          position: relative; overflow: hidden;
         }
         .stat-card:hover { box-shadow: 0 8px 32px rgba(61,38,29,0.08); transform: translateY(-2px); }
         .stat-card-accent { position: absolute; bottom: 0; right: 0; width: 80px; height: 80px; border-radius: 50% 0 0 0; opacity: 0.06; }
 
         .main-table-wrap {
-          background: #fff;
-          border-radius: 20px;
-          border: 1px solid #EEEBE6;
-          overflow: hidden;
-          box-shadow: 0 2px 16px rgba(61,38,29,0.05);
+          background: #fff; border-radius: 20px; border: 1px solid #EEEBE6;
+          overflow: hidden; box-shadow: 0 2px 16px rgba(61,38,29,0.05);
         }
 
+        /* RESPONSIVE TABLE TOOLBAR */
         .table-toolbar {
-          padding: 18px 24px;
-          border-bottom: 1px solid #F0EDE8;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 12px;
-          background: #FDFCFB;
+          padding: 18px 20px; border-bottom: 1px solid #F0EDE8;
+          display: flex; flex-direction: column; gap: 16px; background: #FDFCFB;
+        }
+        .toolbar-left, .toolbar-right { display: flex; gap: 10px; align-items: center; width: 100%; flex-wrap: wrap; }
+        @media (min-width: 768px) {
+          .table-toolbar { flex-direction: row; justify-content: space-between; padding: 18px 24px; }
+          .toolbar-left, .toolbar-right { width: auto; flex-wrap: nowrap; }
         }
 
-        .search-input-wrap { position: relative; }
+        .search-input-wrap { position: relative; flex: 1; min-width: 200px; }
         .search-input-wrap input {
-          padding: 9px 14px 9px 38px;
-          border: 1.5px solid #E8E2DA;
-          border-radius: 12px;
-          font-size: 13px;
-          font-family: 'DM Sans', sans-serif;
-          background: #fff;
-          width: 280px;
-          transition: border-color 0.2s, box-shadow 0.2s;
-          color: #3D261D;
+          padding: 9px 14px 9px 38px; border: 1.5px solid #E8E2DA; border-radius: 12px;
+          font-size: 13px; font-family: 'DM Sans', sans-serif; background: #fff;
+          width: 100%; box-sizing: border-box; transition: border-color 0.2s, box-shadow 0.2s; color: #3D261D;
         }
         .search-input-wrap input:focus { outline: none; border-color: #8B5E3C; box-shadow: 0 0 0 3px rgba(139,94,60,0.1); }
         .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #B5A99A; }
 
         .filter-btn {
-          padding: 9px 14px;
-          border: 1.5px solid #E8E2DA;
-          border-radius: 12px;
-          background: #fff;
-          color: #6B5744;
-          cursor: pointer;
-          display: flex; align-items: center; gap: 6px;
-          font-size: 13px; font-weight: 500;
-          transition: all 0.15s;
-          font-family: 'DM Sans', sans-serif;
+          padding: 9px 14px; border: 1.5px solid #E8E2DA; border-radius: 12px;
+          background: #fff; color: #6B5744; cursor: pointer;
+          display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500;
+          transition: all 0.15s; font-family: 'DM Sans', sans-serif;
         }
         .filter-btn:hover { background: #FAF5F0; border-color: #8B5E3C; }
 
-        table { width: 100%; border-collapse: collapse; }
+        /* RESPONSIVE TABLE WRAPPER PARA SA SWIPE / SCROLL */
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; min-width: 850px; }
         thead tr { background: #FDFCFB; border-bottom: 1.5px solid #F0EDE8; }
         thead th { padding: 12px 20px; font-size: 11px; font-weight: 600; color: #9E8A7A; text-transform: uppercase; letter-spacing: 0.06em; }
         tbody tr { border-bottom: 1px solid #F7F4F1; transition: background 0.15s; }
@@ -284,27 +286,31 @@ export default function Inventory() {
         .view-link { font-size: 12px; font-weight: 600; color: #8B5E3C; text-decoration: none; display: flex; align-items: center; gap: 2px; transition: color 0.15s; }
         .view-link:hover { color: #3D261D; }
 
-        .pagination { padding: 16px 24px; border-top: 1px solid #F0EDE8; display: flex; justify-content: space-between; align-items: center; background: #FDFCFB; }
+        /* RESPONSIVE PAGINATION */
+        .pagination { padding: 16px 20px; border-top: 1px solid #F0EDE8; display: flex; justify-content: center; align-items: center; background: #FDFCFB; text-align: center; }
+        @media (min-width: 640px) { .pagination { justify-content: flex-start; padding: 16px 24px; text-align: left; } }
 
         .drawer-overlay { position: fixed; inset: 0; background: rgba(61,38,29,0.08); backdrop-filter: blur(4px); z-index: 40; }
         .drawer {
           position: fixed; top: 0; right: 0; height: 100vh;
-          width: 100%; max-width: 420px;
-          background: #fff; z-index: 50;
-          border-left: 1px solid #EEEBE6;
-          box-shadow: -8px 0 40px rgba(61,38,29,0.12);
+          width: 100%; max-width: 420px; background: #fff; z-index: 50;
+          border-left: 1px solid #EEEBE6; box-shadow: -8px 0 40px rgba(61,38,29,0.12);
           display: flex; flex-direction: column;
         }
-        .drawer-header { padding: 28px 28px 20px; border-bottom: 1px solid #F0EDE8; }
-        .drawer-body { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
-        .drawer-footer { padding: 20px 28px; border-top: 1px solid #F0EDE8; display: flex; gap: 12px; }
+        .drawer-header { padding: 24px 24px 16px; border-bottom: 1px solid #F0EDE8; }
+        .drawer-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; }
+        .drawer-footer { padding: 16px 24px; border-top: 1px solid #F0EDE8; display: flex; gap: 12px; }
+        @media (min-width: 640px) {
+          .drawer-header { padding: 28px 28px 20px; }
+          .drawer-body { padding: 24px 28px; }
+          .drawer-footer { padding: 20px 28px; }
+        }
 
         .form-label { display: block; font-size: 12px; font-weight: 600; color: #6B5744; margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.05em; }
         .form-input, .form-select {
           width: 100%; border: 1.5px solid #E8E2DA; border-radius: 12px;
           padding: 10px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif;
-          color: #3D261D; background: #fff; transition: border-color 0.2s, box-shadow 0.2s;
-          box-sizing: border-box;
+          color: #3D261D; background: #fff; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
         }
         .form-input:focus, .form-select:focus { outline: none; border-color: #8B5E3C; box-shadow: 0 0 0 3px rgba(139,94,60,0.1); }
         .form-error { font-size: 12px; color: #DC2626; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 10px 14px; }
@@ -312,79 +318,74 @@ export default function Inventory() {
         .btn-primary {
           flex: 1; padding: 11px 20px; border-radius: 12px;
           background: #3D261D; color: #fff; font-weight: 600; font-size: 14px;
-          border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
-          transition: background 0.15s, transform 0.1s;
+          border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s, transform 0.1s;
         }
         .btn-primary:hover { background: #2A1A14; }
         .btn-primary:active { transform: scale(0.98); }
         .btn-ghost {
           flex: 1; padding: 11px 20px; border-radius: 12px;
           background: #fff; color: #6B5744; font-weight: 600; font-size: 14px;
-          border: 1.5px solid #E8E2DA; cursor: pointer; font-family: 'DM Sans', sans-serif;
-          transition: background 0.15s;
+          border: 1.5px solid #E8E2DA; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s;
         }
         .btn-ghost:hover { background: #FAF5F0; }
 
         .add-btn {
-          display: flex; align-items: center; gap: 7px;
+          display: flex; align-items: center; justify-content: center; gap: 7px;
           background: #3D261D; color: #fff; padding: 10px 18px;
           border-radius: 12px; font-size: 13px; font-weight: 600;
           border: none; cursor: pointer; font-family: 'DM Sans', sans-serif;
-          transition: background 0.15s, box-shadow 0.15s;
-          box-shadow: 0 2px 8px rgba(61,38,29,0.18);
+          transition: background 0.15s, box-shadow 0.15s; box-shadow: 0 2px 8px rgba(61,38,29,0.18);
         }
         .add-btn:hover { background: #2A1A14; box-shadow: 0 4px 16px rgba(61,38,29,0.22); }
 
         .export-btn {
-          display: flex; align-items: center; gap: 7px;
+          display: flex; align-items: center; justify-content: center; gap: 7px;
           background: #fff; color: #3D261D; padding: 10px 18px;
           border-radius: 12px; font-size: 13px; font-weight: 600;
-          border: 1.5px solid #E8E2DA; cursor: pointer; font-family: 'DM Sans', sans-serif;
-          transition: all 0.15s;
+          border: 1.5px solid #E8E2DA; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
         }
         .export-btn:hover { background: #FAF5F0; border-color: #C4A882; }
 
+        /* RESPONSIVE ALERT BANNER */
         .alert-banner {
           background: linear-gradient(135deg, #FFF7ED 0%, #FFF3E6 100%);
-          border: 1px solid #FDE68A;
-          border-radius: 14px;
-          padding: 14px 18px;
-          display: flex; align-items: center; gap: 12px;
-          margin-bottom: 28px;
+          border: 1px solid #FDE68A; border-radius: 14px; padding: 14px 18px;
+          display: flex; align-items: flex-start; gap: 12px; margin-bottom: 24px;
+          flex-direction: column;
         }
-
-        .item-name { font-weight: 600; font-size: 14px; color: #1C120D; }
-        .item-id { font-size: 11px; color: #B5A99A; font-weight: 500; margin-top: 1px; }
-        .stock-val { font-weight: 700; font-size: 14px; }
-        .stock-val.warn { color: #D97706; }
-        .stock-val.danger { color: #DC2626; }
-        .stock-val.ok { color: #1C120D; }
+        .alert-banner-content { display: flex; align-items: flex-start; gap: 12px; width: 100%; }
+        @media (min-width: 640px) {
+          .alert-banner { flex-direction: row; align-items: center; margin-bottom: 28px; }
+        }
       `}</style>
 
-      <div className="inv-root" style={{ width: '100%', padding: '36px 40px', boxSizing: 'border-box' }}>
-        <div className="flex justify-between items-end mb-8">
+      <div className="inv-root inv-container">
+        <div className="page-header">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 font-serif mb-1">Inventory Management</h1>
             <p className="text-gray-500 text-sm">Monitor and manage your coffee shop supplies and ingredients.</p>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div className="header-actions">
             <button className="export-btn"><Download style={{ width: 15, height: 15 }} /> Export CSV</button>
             <button className="add-btn" onClick={() => setIsAddDrawerOpen(true)}><Plus style={{ width: 15, height: 15 }} /> Add New Item</button>
           </div>
         </div>
 
         <div className="alert-banner">
-          <AlertTriangle style={{ width: 18, height: 18, color: '#D97706', flexShrink: 0 }} />
-          <div style={{ flex: 1 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#92400E' }}>Attention needed - </span>
-            <span style={{ fontSize: 13, color: '#92400E' }}>{stats.lowCount} items are running low and {stats.outCount} items are out of stock.</span>
+          <div className="alert-banner-content">
+            <AlertTriangle style={{ width: 18, height: 18, color: '#D97706', flexShrink: 0, marginTop: 2 }} />
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#92400E' }}>Attention needed - </span>
+              <span style={{ fontSize: 13, color: '#92400E' }}>{stats.lowCount} items are running low and {stats.outCount} items are out of stock.</span>
+            </div>
           </div>
-          <button style={{ fontSize: 12, fontWeight: 600, color: '#8B5E3C', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3 }}>
+          <button style={{ fontSize: 12, fontWeight: 600, color: '#8B5E3C', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 3, alignSelf: 'flex-end' }}>
             Review <ChevronRight style={{ width: 13, height: 13 }} />
           </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 18, marginBottom: 28 }}>
+        <div className="stats-grid">
+          {/* eslint-disable-next-line no-unused-vars */}
           {[
             { icon: Package, label: 'Total Items', value: stats.total.toString(), sub: 'Across categories', accent: '#3D261D', iconBg: '#F5F0EB' },
             { icon: AlertTriangle, label: 'Low Stock Alerts', value: stats.lowCount.toString(), sub: 'Action required', accent: '#D97706', iconBg: '#FFF8ED' },
@@ -411,7 +412,7 @@ export default function Inventory() {
           )}
 
           <div className="table-toolbar">
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <div className="toolbar-left">
               <div className="search-input-wrap">
                 <Search className="search-icon" style={{ width: 15, height: 15 }} />
                 <input
@@ -423,12 +424,12 @@ export default function Inventory() {
               </div>
               <button className="filter-btn"><Filter style={{ width: 13, height: 13 }} /> Filter</button>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div className="toolbar-right">
               <span style={{ fontSize: 12, color: '#9E8A7A', fontWeight: 500 }}>Category:</span>
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                style={{ border: 'none', background: 'transparent', fontSize: 13, fontWeight: 600, color: '#3D261D', outline: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
+                style={{ border: 'none', background: 'transparent', fontSize: 13, fontWeight: 600, color: '#3D261D', outline: 'none', cursor: 'pointer', fontFamily: "'DM Sans', sans-serif", flex: 1 }}
               >
                 {['All', 'Beans', 'Milk', 'Syrup', 'Cups', 'Pastries', 'Equipment', 'Other'].map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -437,61 +438,75 @@ export default function Inventory() {
             </div>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th style={{ width: 48, textAlign: 'center' }}><input type="checkbox" style={{ accentColor: '#3D261D' }} /></th>
-                <th style={{ textAlign: 'left' }}>Item Details</th>
-                <th style={{ textAlign: 'left' }}>Category</th>
-                <th style={{ textAlign: 'left' }}>Stock</th>
-                <th style={{ textAlign: 'left' }}>Reorder Level</th>
-                <th style={{ textAlign: 'left' }}>Last Order</th>
-                <th style={{ textAlign: 'left' }}>Status</th>
-                <th style={{ textAlign: 'center' }}>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {isLoadingItems ? (
-                <tr><td colSpan={8} style={{ textAlign: 'center', color: '#9E8A7A', padding: '20px' }}>Loading inventory...</td></tr>
-              ) : filteredItems.length === 0 ? (
-                <tr><td colSpan={8} style={{ textAlign: 'center', color: '#9E8A7A', padding: '20px' }}>No items found.</td></tr>
-              ) : (
-                filteredItems.map((item) => {
-                  const cc = categoryColors[item.cat] || categoryColors.Other;
-                  return (
-                    <tr key={item.id} className={item.isOut ? 'out-row' : ''}>
-                      <td style={{ textAlign: 'center' }}><input type="checkbox" style={{ accentColor: '#3D261D' }} /></td>
-                      <td>
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-id">{item.id}</div>
-                      </td>
-                      <td>
-                        <span className={`cat-badge ${cc.bg} ${cc.text} ${cc.border}`}>
-                          <span className={`cat-dot ${cc.dot}`} />
-                          {item.cat}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`stock-val ${item.isOut ? 'danger' : item.isLow ? 'warn' : 'ok'}`}>{item.stock}</span>
-                      </td>
-                      <td style={{ fontSize: 13, color: '#6B5744', fontWeight: 500 }}>{item.reorder}</td>
-                      <td style={{ fontSize: 12, color: '#9E8A7A' }}>{item.date}</td>
-                      <td>
-                        <span className={`status-pill ${item.isOut ? 'status-out' : item.isLow ? 'status-low' : 'status-healthy'}`}>
-                          {item.status}
-                        </span>
-                      </td>
-                      <td style={{ textAlign: 'center' }}>
-                        <button className="view-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                          View <ChevronRight style={{ width: 12, height: 12 }} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+          <div className="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: 48, textAlign: 'center' }}><input type="checkbox" style={{ accentColor: '#3D261D' }} /></th>
+                  <th style={{ textAlign: 'left' }}>Item Details</th>
+                  <th style={{ textAlign: 'left' }}>Category</th>
+                  <th style={{ textAlign: 'left' }}>Stock</th>
+                  {/* ====== MGA BAGONG COLUMNS ====== */}
+                  <th style={{ textAlign: 'left' }}>Unit Cost</th>
+                  <th style={{ textAlign: 'left' }}>Total Value</th>
+                  {/* ================================== */}
+                  <th style={{ textAlign: 'left' }}>Reorder Level</th>
+                  <th style={{ textAlign: 'left' }}>Last Order</th>
+                  <th style={{ textAlign: 'left' }}>Status</th>
+                  <th style={{ textAlign: 'center' }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {isLoadingItems ? (
+                  <tr><td colSpan={10} style={{ textAlign: 'center', color: '#9E8A7A', padding: '20px' }}>Loading inventory...</td></tr>
+                ) : filteredItems.length === 0 ? (
+                  <tr><td colSpan={10} style={{ textAlign: 'center', color: '#9E8A7A', padding: '20px' }}>No items found.</td></tr>
+                ) : (
+                  filteredItems.map((item) => {
+                    const cc = categoryColors[item.cat] || categoryColors.Other;
+                    return (
+                      <tr key={item.id} className={item.isOut ? 'out-row' : ''}>
+                        <td style={{ textAlign: 'center' }}><input type="checkbox" style={{ accentColor: '#3D261D' }} /></td>
+                        <td>
+                          <div className="item-name">{item.name}</div>
+                          <div className="item-id">{item.id}</div>
+                        </td>
+                        <td>
+                          <span className={`cat-badge ${cc.bg} ${cc.text} ${cc.border}`}>
+                            <span className={`cat-dot ${cc.dot}`} />
+                            {item.cat}
+                          </span>
+                        </td>
+                        <td>
+                          <span className={`stock-val ${item.isOut ? 'danger' : item.isLow ? 'warn' : 'ok'}`}>{item.stock}</span>
+                        </td>
+                        {/* ====== MGA BAGONG VALUES NA PINA-ADD NG LEADER MO ====== */}
+                        <td style={{ fontSize: 13, color: '#6B5744', fontWeight: 500 }}>
+                          ${item.costPrice.toFixed(2)}
+                        </td>
+                        <td style={{ fontSize: 13, color: '#059669', fontWeight: 700 }}>
+                          ${(item.quantity * item.costPrice).toFixed(2)}
+                        </td>
+                        {/* ========================================================= */}
+                        <td style={{ fontSize: 13, color: '#6B5744', fontWeight: 500 }}>{item.reorder}</td>
+                        <td style={{ fontSize: 12, color: '#9E8A7A' }}>{item.date}</td>
+                        <td>
+                          <span className={`status-pill ${item.isOut ? 'status-out' : item.isLow ? 'status-low' : 'status-healthy'}`}>
+                            {item.status}
+                          </span>
+                        </td>
+                        <td style={{ textAlign: 'center' }}>
+                          <button className="view-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+                            View <ChevronRight style={{ width: 12, height: 12 }} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
 
           <div className="pagination">
             <p style={{ fontSize: 12, color: '#9E8A7A' }}>
