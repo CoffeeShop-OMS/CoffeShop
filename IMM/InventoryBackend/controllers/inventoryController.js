@@ -75,12 +75,9 @@ const getAllItems = async (req, res) => {
     const { category, lowStock, search, limit = 20, startAfter } = req.query;
     const limitNum = Math.min(parseInt(limit), 100);
 
-    let query = db.collection(COLLECTION).where("status", "==", "active");
-
-    if (category) query = query.where("category", "==", category);
-    if (lowStock === "true") query = query.where("isLowStock", "==", true);
-
-    query = query.orderBy("name").limit(limitNum);
+    // Use a broad query + in-memory filtering to avoid composite-index failures
+    // in environments where Firestore indexes are not yet created.
+    let query = db.collection(COLLECTION).limit(limitNum);
 
     if (startAfter) {
       const lastDoc = await db.collection(COLLECTION).doc(startAfter).get();
@@ -88,18 +85,24 @@ const getAllItems = async (req, res) => {
     }
 
     const snapshot = await query.get();
-    let items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    let items = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((i) => i.status === "active");
 
-    // Client-side search filter (Firestore doesn't support full-text natively)
+    if (category) items = items.filter((i) => i.category === category);
+    if (lowStock === "true") items = items.filter((i) => i.isLowStock === true);
+
     if (search) {
       const term = search.toLowerCase();
       items = items.filter(
         (i) =>
-          i.name.toLowerCase().includes(term) ||
-          i.sku.toLowerCase().includes(term) ||
+          (i.name || "").toLowerCase().includes(term) ||
+          (i.sku || "").toLowerCase().includes(term) ||
           (i.supplier || "").toLowerCase().includes(term)
       );
     }
+
+    items.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
     const lastVisible = snapshot.docs[snapshot.docs.length - 1];
 

@@ -1,4 +1,5 @@
 const { auth, db } = require("../config/firebase");
+const { verifyAdminSessionToken } = require("../utils/adminSession");
 
 /**
  * Verifies Firebase ID token sent in Authorization header.
@@ -16,6 +17,19 @@ const verifyToken = async (req, res, next) => {
     }
 
     const idToken = authHeader.split("Bearer ")[1];
+    const adminSession = verifyAdminSessionToken(idToken);
+
+    // Accept backend-issued admin session token (for admin dashboard login flow)
+    if (adminSession) {
+      req.user = {
+        uid: `admin:${adminSession.email}`,
+        email: adminSession.email,
+        role: adminSession.role,
+        status: "active",
+        authType: "admin-session",
+      };
+      return next();
+    }
 
     // Verify token with Firebase Auth
     const decodedToken = await auth.verifyIdToken(idToken);
