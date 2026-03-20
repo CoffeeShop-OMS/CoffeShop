@@ -2,15 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; /* <-- BAGONG IMPORT PARA LUMIPAT NG PAGE */
 import { Coffee, Mail, Lock, Eye, EyeOff, ArrowRight, Leaf, Bean } from 'lucide-react';
 import { saveAuthSession } from '../utils/authStorage';
+import { adminLogin } from '../services/api';
 
 /* esl/* <-- Para hindi magalit ang ESLint */
 export default function Login({ setIsAuthenticated }) {
   const navigate = useNavigate(); /* <-- TINAWAG NATIN ANG TAGA-LIPAT NG PAGE */
-  const apiBaseUrl = (
-    import.meta.env.VITE_BACKEND_BASE_URL ||
-    "http://localhost:5000"
-  ).replace(/\/$/, "");
-  const authApiBaseUrl = apiBaseUrl.endsWith("/api") ? apiBaseUrl : `${apiBaseUrl}/api`;
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,20 +22,7 @@ export default function Login({ setIsAuthenticated }) {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${authApiBaseUrl}/auth/admin/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        setError(result.message || "Login failed. Please try again.");
-        return;
-      }
+      const result = await adminLogin({ email, password });
       if (!result?.data?.token) {
         setError("Login failed: session token not provided by server.");
         return;
@@ -59,7 +42,7 @@ export default function Login({ setIsAuthenticated }) {
       setIsAuthenticated(true); // 1. Bubuksan ang lock sa App.jsx
       navigate('/dashboard');   // 2. Lilipat na ang page sa Dashboard!
     } catch (err) {
-      setError("Cannot connect to server. Please check backend connection.");
+      setError(err?.message || "Cannot connect to server. Please check backend connection.");
     } finally {
       setIsLoading(false);
     }

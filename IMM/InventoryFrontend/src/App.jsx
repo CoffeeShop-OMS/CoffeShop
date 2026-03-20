@@ -6,14 +6,9 @@ import Inventory from "./pages/Inventory";
 import Reports from "./pages/Reports";
 import Layout from "./components/Layout";
 import { clearAuthSession, getAuthSession } from "./utils/authStorage";
+import { verifyAdminSession } from "./services/api";
 
 export default function App() {
-  const apiBaseUrl = (
-    import.meta.env.VITE_API_BASE_URL ||
-    import.meta.env.VITE_BACKEND_BASE_URL ||
-    "http://localhost:5000"
-  ).replace(/\/$/, "");
-  const authApiBaseUrl = apiBaseUrl.endsWith("/api") ? apiBaseUrl : `${apiBaseUrl}/api`;
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
@@ -28,21 +23,8 @@ export default function App() {
       }
 
       try {
-        const response = await fetch(`${authApiBaseUrl}/auth/admin/verify`, {
-          headers: {
-            Authorization: `Bearer ${session.token}`,
-          },
-        });
-
-        const result = await response.json();
-        const isValid = response.ok && result?.success;
-
-        if (!isValid) {
-          clearAuthSession();
-          setIsAuthenticated(false);
-        } else {
-          setIsAuthenticated(true);
-        }
+        await verifyAdminSession(session.token);
+        setIsAuthenticated(true);
       } catch {
         clearAuthSession();
         setIsAuthenticated(false);
@@ -52,7 +34,7 @@ export default function App() {
     };
 
     verifySession();
-  }, [authApiBaseUrl]);
+  }, []);
 
   if (isCheckingAuth) return null;
 
