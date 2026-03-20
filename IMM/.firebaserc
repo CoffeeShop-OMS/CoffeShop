@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "production": "coffeeteaconnection",
+    "productionfrontend": "coffeeteaconnection"
+  },
+  "targets": {},
+  "etags": {}
+}

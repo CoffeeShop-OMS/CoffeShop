@@ -1,7 +1,7 @@
 const rawBaseUrl =
   import.meta.env.VITE_API_BASE_URL ||
   import.meta.env.VITE_BACKEND_BASE_URL ||
-  "http://localhost:5000";
+  "http://localhost:4000";
 
 const apiBaseUrl = rawBaseUrl.replace(/\/$/, "");
 const apiRoot = apiBaseUrl.endsWith("/api") ? apiBaseUrl : `${apiBaseUrl}/api`;
@@ -73,4 +73,3 @@ export const createInventoryItem = (token, payload) =>
   });
 
 export { apiRoot };
-

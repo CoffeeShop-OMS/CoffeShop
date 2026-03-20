@@ -74,8 +74,10 @@ app.use((err, req, res, next) => {
 // ─── Start Server ─────────────────────────────────────────────────────────────
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 IMM Backend running on port ${PORT} [${process.env.NODE_ENV || "development"}]`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`IMM Backend running on port ${PORT} [${process.env.NODE_ENV || "development"}]`);
+  });
+}
 
 module.exports = app;
