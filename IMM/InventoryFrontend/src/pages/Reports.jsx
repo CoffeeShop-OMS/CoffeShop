@@ -252,10 +252,10 @@ export default function Reports({ setIsAuthenticated }) {
                 </div>
 
                 <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center"><span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#3D261D]"></div> Coffee Beans</span><span className="font-bold text-gray-900">45%</span></div>
-                  <div className="flex justify-between items-center"><span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#1A1A1A]"></div> Dairy & Milk</span><span className="font-bold text-gray-900">25%</span></div>
-                  <div className="flex justify-between items-center"><span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#F0EBE6]"></div> Pastries</span><span className="font-bold text-gray-900">15%</span></div>
-                  <div className="flex justify-between items-center"><span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#D1D5DB]"></div> Packaging</span><span className="font-bold text-gray-900">10%</span></div>
+                  <div className="flex justify-between items-center"><span className="flex items-center gap-2 text-gray-900"><div className="w-2 h-2 rounded-full bg-[#3D261D]"></div>Coffee Beans</span><span className="font-bold text-gray-900">45%</span></div>
+                  <div className="flex justify-between items-center"><span className="flex items-center gap-2 text-gray-900"><div className="w-2 h-2 rounded-full bg-[#1A1A1A]"></div>Dairy & Milk</span><span className="font-bold text-gray-900">25%</span></div>
+                  <div className="flex justify-between items-center"><span className="flex items-center gap-2 text-gray-900"><div className="w-2 h-2 rounded-full bg-[#F0EBE6]"></div>Pastries</span><span className="font-bold text-gray-900">15%</span></div>
+                  <div className="flex justify-between items-center"><span className="flex items-center gap-2 text-gray-900"><div className="w-2 h-2 rounded-full bg-[#D1D5DB]"></div>Packaging</span><span className="font-bold text-gray-900">10%</span></div>
                 </div>
               </div>
 

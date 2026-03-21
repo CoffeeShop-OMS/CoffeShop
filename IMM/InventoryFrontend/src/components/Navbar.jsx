@@ -2,7 +2,7 @@ import { Search, Bell } from 'lucide-react';
 
 export default function Navbar({ collapsed }) {
   return (
-    <header className="h-16 bg-[#FBFBFA] border-b border-gray-200 flex items-center justify-between px-4 md:px-8 flex-shrink-0 transition-all duration-300">
+    <header className="h-16 bg-[#FBFBFA] border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shrink-0 transition-all duration-300">
       <div className="relative w-full md:w-96">
       </div>
       <div className="flex items-center gap-6">

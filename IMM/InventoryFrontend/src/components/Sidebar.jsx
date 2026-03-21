@@ -21,21 +21,21 @@ export default function Sidebar({ setIsAuthenticated, collapsed, setCollapsed })
     };
 
     return (
-        <aside className={`hidden md:flex flex-col justify-between flex-shrink-0 bg-white border-r border-gray-100 transition-all duration-300 overflow-visible relative ${collapsed ? 'w-[60px]' : 'w-60'}`}>
+        <aside className={`hidden md:flex flex-col justify-between shrink-0 bg-white border-r border-gray-100 transition-all duration-300 overflow-visible relative ${collapsed ? 'w-15' : 'w-60'}`}>
 
             {/* Toggle Button - pure arrow, no background */}
             <button
                 onClick={() => setCollapsed(!collapsed)}
-                className="absolute -right-4 top-[26px] z-50 text-gray-300 hover:text-[#3D261D] transition-colors duration-200 focus:outline-none"
+                className="absolute -right-6 top-5.5 z-50 text-gray-500 hover:text-[#27160f] transition-colors duration-200 focus:outline-none"
                 style={{ background: 'none', border: 'none', padding: 0 }}
             >
-                <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${collapsed ? '' : 'rotate-180'}`} />
+                <ChevronRight className={`w-5 h-5 transition-transform duration-300 ${collapsed ? '' : 'rotate-180'}`} />
             </button>
 
             <div>
                 {/* Brand */}
                 <div className="h-16 flex items-center px-3 gap-2 border-b border-gray-100 overflow-hidden">
-                    <div className="flex-shrink-0 p-1.5 rounded-lg">
+                    <div className="shrink-0 p-1.5 rounded-lg">
                         <img src="/Logo.png" alt="Coffee & Tea" className="w-6 h-6 object-contain" />
                     </div>
                     {!collapsed && (
@@ -64,7 +64,7 @@ export default function Sidebar({ setIsAuthenticated, collapsed, setCollapsed })
                                 }`}
                             >
                                 <Icon
-                                    className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:scale-110"
+                                    className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110"
                                     style={{ color: isActive ? '#fbbf24' : undefined }}
                                 />
                                 {!collapsed && (
@@ -87,7 +87,7 @@ export default function Sidebar({ setIsAuthenticated, collapsed, setCollapsed })
                         collapsed ? 'justify-center p-2.5' : 'gap-3 px-2.5 py-2.5'
                     }`}
                 >
-                    <Settings className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:rotate-45 group-hover:text-[#3D261D]" />
+                    <Settings className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:rotate-45 group-hover:text-[#3D261D]" />
                     {!collapsed && <span className="whitespace-nowrap">Settings</span>}
                 </Link>
 
@@ -98,7 +98,7 @@ export default function Sidebar({ setIsAuthenticated, collapsed, setCollapsed })
                         collapsed ? 'justify-center p-2.5' : 'gap-3 px-2.5 py-2.5'
                     }`}
                 >
-                    <LogOut className="w-4 h-4 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-red-600" />
+                    <LogOut className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-red-600" />
                     {!collapsed && <span className="whitespace-nowrap">Logout</span>}
                 </button>
             </div>

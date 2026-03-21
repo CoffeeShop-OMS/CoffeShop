@@ -1,5 +1,4 @@
 import {
- 
   Coffee, Package, Calendar, Plus, 
   DollarSign, AlertTriangle, TrendingUp, TrendingDown,
   PlusCircle, Trash2, ShoppingCart, RefreshCw, ArrowUpRight
@@ -226,7 +225,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                   <div className="border-b border-gray-300 w-full h-0"></div>
                 </div>
                 {/* Line Chart SVG */}
-                <svg className="absolute inset-0 w-full h-full pb-4" preserveAspectRatio="none" viewBox="0 0 100 100">
+                <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="xMidYMid meet" viewBox="0 0 100 100">
                   <path d="M0,80 L20,60 L40,75 L60,30 L80,55 L100,10" fill="none" stroke="#4A332A" strokeWidth="2.5" />
                   <circle cx="0" cy="80" r="3" fill="#4A332A" />
                   <circle cx="20" cy="60" r="3" fill="#4A332A" />
@@ -236,7 +235,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                   <circle cx="100" cy="10" r="3" fill="#4A332A" />
                 </svg>
                 {/* X-Axis labels */}
-                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[10px] text-gray-400">
+                <div className="absolute top-38 left-0 right-0 flex justify-between text-[10px] text-gray-400">
                   <span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
                 </div>
               </div>
@@ -259,11 +258,11 @@ export default function Dashboard({ setIsAuthenticated }) {
               
               <div className="flex-1 relative">
                 {/* Vertical Line */}
-                <div className="absolute left-[11px] top-2 bottom-2 w-[2px] bg-gray-100"></div>
+                <div className="absolute left-2.75 top-2 bottom-2 w-0.5 bg-gray-100"></div>
                 
                 <div className="space-y-5 relative z-10">
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center bg-white"><PlusCircle className="w-3 h-3 text-gray-600" /></div>
+                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center"><PlusCircle className="w-3 h-3 text-gray-600" /></div>
                     <div>
                       <p className="text-xs font-bold text-gray-900">Stock Added <span className="font-normal text-[10px] text-gray-400 ml-1">08:15 AM</span></p>
                       <p className="text-xs text-gray-600">20kg Brazilian Santos</p>
@@ -272,7 +271,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                   </div>
                   
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center bg-white"><Trash2 className="w-3 h-3 text-red-400" /></div>
+                    <div className="w-6 h-6 rounded-full bg-red-50 border-2 border-red-100 flex items-center justify-center"><Trash2 className="w-3 h-3 text-red-400" /></div>
                     <div>
                       <p className="text-xs font-bold text-gray-900">Waste Logged <span className="font-normal text-[10px] text-gray-400 ml-1">10:30 AM</span></p>
                       <p className="text-xs text-gray-600">450ml Whole Milk (Exp.)</p>
@@ -281,7 +280,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center bg-white"><ShoppingCart className="w-3 h-3 text-gray-600" /></div>
+                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center"><ShoppingCart className="w-3 h-3 text-gray-600" /></div>
                     <div>
                       <p className="text-xs font-bold text-gray-900">Order Placed <span className="font-normal text-[10px] text-gray-400 ml-1">11:45 AM</span></p>
                       <p className="text-xs text-gray-600">Weekly Dairy Supply</p>
@@ -290,7 +289,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                   </div>
 
                   <div className="flex gap-4">
-                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center bg-white"><RefreshCw className="w-3 h-3 text-gray-600" /></div>
+                    <div className="w-6 h-6 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center"><RefreshCw className="w-3 h-3 text-gray-600" /></div>
                     <div>
                       <p className="text-xs font-bold text-gray-900">Stock Update <span className="font-normal text-[10px] text-gray-400 ml-1">02:20 PM</span></p>
                       <p className="text-xs text-gray-600">Pastry inventory sync</p>

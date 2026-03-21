@@ -49,11 +49,11 @@ export default function Login({ setIsAuthenticated }) {
   };
 
   return (
-    <div className="fixed inset-0 h-screen w-screen flex flex-col md:flex-row font-sans bg-[#FBFBFA] z-50">
+    <div className="fixed inset-0 h-screen w-screen flex flex-col md:flex-row font-sans bg-[#FBFBFA] z-50 select-none">
       
       {/* LEFT SIDE - LOGIN FORM */}
       <div className="w-full md:w-1/2 h-full flex flex-col justify-center items-center bg-[#FBFBFA] p-8">
-        <div className="w-full max-w-[400px]">
+        <div className="w-full max-w-100">
           <h1 className="text-4xl font-bold text-[#332926] mb-2 font-serif tracking-tight">Welcome Back</h1>
           <p className="text-gray-500 text-base mb-8">Sign in to manage your inventory</p>
 
@@ -161,7 +161,7 @@ export default function Login({ setIsAuthenticated }) {
 
         <div className="relative z-10 flex flex-col items-center max-w-md">
           <div className="w-80 h-80 bg-white/10 rounded-full flex items-center justify-center mb-8 backdrop-blur-sm">
-            <img src="/Logo.png" alt="Coffee Shop" className="w-72 h-72 object-contain" />
+            <img src="/Logo.png" alt="Coffee Shop" className="w-72 h-72 object-contain" draggable="false"/>
           </div>
           <h2 className="text-4xl font-bold mb-4 font-serif">Coffee & Tea</h2>
           <p className="text-white/80 mb-8 leading-relaxed text-lg">

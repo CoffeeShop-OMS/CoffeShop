@@ -4,13 +4,10 @@ export default function InventoryHeader({ onAddClick, btnBrown, onExportCSV }) {
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 lg:mb-8">
       <div className="flex items-center gap-3">
-        <div className="bg-[#3D261D] rounded-2xl p-2.5 sm:p-3 shadow-md shrink-0">
-          <Coffee className="w-4 h-4 sm:w-5 sm:h-5 text-[#D4A574]" />
-        </div>
         <div>
           <h1
             className="text-xl sm:text-2xl font-bold text-[#1C100A] tracking-tight"
-            style={{ fontFamily: "'Playfair Display', serif" }}
+            style={{ fontFamily: "serif" }}
           >
             Inventory Management
           </h1>
