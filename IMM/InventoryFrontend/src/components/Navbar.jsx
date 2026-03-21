@@ -1,9 +1,18 @@
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, Menu } from 'lucide-react';
 
-export default function Navbar({ collapsed }) {
+export default function Navbar({ collapsed, setMobileOpen }) {
   return (
     <header className="h-16 bg-[#FBFBFA] border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shrink-0 transition-all duration-300">
-      <div className="relative w-full md:w-96">
+      <div className="flex items-center gap-3">
+        <button
+          aria-label="Open menu"
+          className="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100"
+          onClick={() => setMobileOpen && setMobileOpen(true)}
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="relative w-full md:w-96">
+        </div>
       </div>
       <div className="flex items-center gap-6">
         <button className="relative text-gray-500 hover:text-gray-700">
