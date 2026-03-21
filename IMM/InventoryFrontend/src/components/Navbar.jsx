@@ -11,12 +11,12 @@ export default function Navbar({ collapsed }) {
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
         <div className="flex items-center gap-3 border-l border-gray-200 pl-6">
-          <div className="text-right">
+          <div className="hidden md:block text-right">
             <p className="text-sm font-bold text-gray-800">Admin User</p>
             <p className="text-xs text-gray-500">Store Manager</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-gray-300 border border-gray-400 overflow-hidden">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=3D261D&color=fff" alt="User" />
+          <div className="w-10 h-10 rounded-full bg-gray-300 border border-gray-400 overflow-hidden" title="Admin User" aria-label="Admin User">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=3D261D&color=fff" alt="Admin User avatar" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>

@@ -38,7 +38,7 @@ export default function ItemDrawer({
         onClick={onClose}
         className="fixed inset-0 bg-[#1C100A]/20 backdrop-blur-[2px] z-40 border-none p-0 cursor-default w-full"
       />
-      <aside className="fixed inset-0 sm:inset-auto sm:top-0 sm:right-0 sm:h-screen sm:w-full sm:max-w-[420px] bg-white sm:border-l border-[#EAE5E0] shadow-2xl z-50 flex flex-col">
+      <aside className="fixed inset-0 sm:inset-auto sm:top-0 sm:right-0 sm:h-screen sm:w-full sm:max-w-105 bg-white sm:border-l border-[#EAE5E0] shadow-2xl z-50 flex flex-col">
         <form onSubmit={onSubmit} className="flex flex-col h-full">
           <div className="px-5 sm:px-7 pt-5 sm:pt-7 pb-4 sm:pb-5 border-b border-[#F0EDE8] bg-[#FDFCFB]">
             <div className="flex justify-between items-start">

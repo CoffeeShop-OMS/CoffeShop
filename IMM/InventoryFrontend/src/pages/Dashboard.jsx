@@ -1,23 +1,80 @@
+import { useEffect, useState } from 'react';
 import {
-  Coffee, Package, Calendar, Plus, 
+  Coffee, Package, Calendar, Plus,
   DollarSign, AlertTriangle, TrendingUp, TrendingDown,
   PlusCircle, Trash2, ShoppingCart, RefreshCw, ArrowUpRight
 } from 'lucide-react';
 
+import StatCards from '../components/inventory/StatCards';
+import { getInventory } from '../services/api';
+import { getAuthSession } from '../utils/authStorage';
+import { toast } from 'react-toastify';
+
 export default function Dashboard({ setIsAuthenticated }) {
+  const [stats, setStats] = useState({ total: 0, lowCount: 0, outCount: 0, value: 0 });
+  const [lastSync, setLastSync] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadStats = async () => {
+      const session = getAuthSession();
+      if (!session?.token) return;
+      try {
+        const res = await getInventory(session.token, { limit: 100 });
+        const items = Array.isArray(res?.data) ? res.data : [];
+
+        let total = items.length;
+        let lowCount = 0;
+        let outCount = 0;
+        let value = 0;
+
+        items.forEach((item) => {
+          const quantity = Number(item.quantity || 0);
+          const threshold = Number(item.lowStockThreshold || 0);
+          const costPrice = Number(item.costPrice || 0);
+
+          if (quantity <= 0) outCount += 1;
+          else if (quantity <= threshold) lowCount += 1;
+
+          value += quantity * costPrice;
+        });
+
+        if (mounted) {
+          setStats({ total, lowCount, outCount, value });
+          setLastSync(new Date());
+        }
+      } catch (err) {
+        toast.error(err?.message || 'Failed to load inventory stats');
+      }
+    };
+
+    loadStats();
+    const interval = setInterval(loadStats, 60 * 1000); // refresh every minute
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
+
+  const formattedDate = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+
   return (
-    <div className="w-full p-8">
+    <div className="w-full p-8 bg-[#F7F4F0]">
           
-          {/* Welcome Section */}
-          <div className="flex justify-between items-end mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 font-serif mb-1">Morning, Arabica Manager</h1>
-              <p className="text-gray-500 text-sm">Your inventory health is <span className="font-semibold text-gray-700">92%</span>. 4 items need your attention.</p>
+          {/* Welcome Section (styled like InventoryHeader) */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 lg:mb-8">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1
+                  className="text-xl sm:text-2xl font-bold text-[#1C100A] tracking-tight"
+                  style={{ fontFamily: "serif" }}
+                >
+                  Morning, Arabica Manager
+                </h1>
+                <p className="text-xs text-[#9E8A7A] mt-0.5 hidden sm:block">Your inventory health is <span className="font-semibold text-gray-700">92%</span>. 4 items need your attention.</p>
+              </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 shrink-0">
               <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">
                 <Calendar className="w-4 h-4" />
-                Jun 12, 2024
+                {formattedDate}
               </button>
               <button className="flex items-center gap-2 bg-[#3D261D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2A1A14] transition-colors">
                 <Plus className="w-4 h-4" />
@@ -26,53 +83,15 @@ export default function Dashboard({ setIsAuthenticated }) {
             </div>
           </div>
 
-          {/* Top Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
-              <div className="flex justify-between items-start">
-                <div className="p-2 bg-gray-50 rounded-lg">
-                  <Package className="w-5 h-5 text-gray-600" />
-                </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-md">
-                  <TrendingUp className="w-3 h-3" /> +12% from last week
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Total Inventory Items</p>
-                <p className="text-2xl font-bold font-serif text-gray-900">1,284</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
-              <div className="flex justify-between items-start">
-                <div className="p-2 bg-gray-50 rounded-lg">
-                  <DollarSign className="w-5 h-5 text-gray-600" />
-                </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-md">
-                  <TrendingUp className="w-3 h-3" /> +3.4% vs last month
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Current Value (USD)</p>
-                <p className="text-2xl font-bold font-serif text-gray-900">₱24,580.00</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
-              <div className="flex justify-between items-start">
-                <div className="p-2 bg-gray-50 rounded-lg">
-                  <AlertTriangle className="w-5 h-5 text-gray-600" />
-                </div>
-                <div className="flex items-center gap-1 text-xs font-semibold text-red-500 bg-red-50 px-2 py-1 rounded-md">
-                  <TrendingDown className="w-3 h-3" /> -2 since yesterday
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Low Stock Items</p>
-                <p className="text-2xl font-bold font-serif text-gray-900">14</p>
-              </div>
-            </div>
-          </div>
+          {/* Top Stats Cards (live data) */}
+          <StatCards
+            cards={[
+              { icon: Package, label: 'Total Items', value: String(stats.total), sub: 'Across all categories', accent: '#3D261D', iconBg: 'bg-[#EDE4DC]', iconColor: '#3D261D' },
+              { icon: DollarSign, label: 'Inventory Value', value: `₱${Number(stats.value || 0).toFixed(2)}`, sub: 'Current valuation', accent: '#059669', iconBg: 'bg-emerald-100', iconColor: '#059669' },
+              { icon: AlertTriangle, label: 'Low Items', value: String(stats.lowCount), sub: 'Need attention', accent: '#DC2626', iconBg: 'bg-red-100', iconColor: '#DC2626' },
+              { icon: RefreshCw, label: 'Last Sync', value: lastSync ? new Date(lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—', sub: lastSync ? new Date(lastSync).toLocaleDateString() : '', accent: '#6B7280', iconBg: 'bg-gray-100', iconColor: '#374151' },
+            ]}
+          />
 
           {/* Middle Section - Graphs & Alerts */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

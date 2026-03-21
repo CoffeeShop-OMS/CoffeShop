@@ -4,6 +4,8 @@ import {
   ChevronDown, Coffee
 } from 'lucide-react';
 
+import StatCards from '../components/inventory/StatCards';
+
 export default function Reports({ setIsAuthenticated }) {
   
   // Data para sa Detailed Waste Log table
@@ -16,15 +18,22 @@ export default function Reports({ setIsAuthenticated }) {
   ];
 
   return (
-    <div className="w-full p-8">
+    <div className="w-full p-8 bg-[#F7F4F0]">
           
-          {/* Page Header */}
-          <div className="flex justify-between items-end mb-8">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 font-serif mb-1">Inventory Reports</h1>
-              <p className="text-gray-500 text-sm">Deep-dive analysis of your stock performance and waste tracking.</p>
+          {/* Page Header (styled like InventoryHeader) */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 lg:mb-8">
+            <div className="flex items-center gap-3">
+              <div>
+                <h1
+                  className="text-xl sm:text-2xl font-bold text-[#1C100A] tracking-tight"
+                  style={{ fontFamily: "serif" }}
+                >
+                  Inventory Reports
+                </h1>
+                <p className="text-xs text-[#9E8A7A] mt-0.5 hidden sm:block">Deep-dive analysis of your stock performance and waste tracking.</p>
+              </div>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 shrink-0">
               <button className="flex items-center gap-2 bg-white border border-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm">
                 <Download className="w-4 h-4" /> Export CSV
               </button>
@@ -34,65 +43,14 @@ export default function Reports({ setIsAuthenticated }) {
             </div>
           </div>
 
-          {/* Top Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {/* Card 1 */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-36">
-              <div className="flex justify-between items-start mb-2">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Stock Turnover</p>
-                <div className="p-1.5 bg-gray-50 border border-gray-100 rounded-md">
-                  <TrendingUp className="w-4 h-4 text-gray-600" />
-                </div>
-              </div>
-              <div>
-                <p className="text-3xl font-bold font-serif text-gray-900 mb-3">8.4x</p>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1 text-[11px] font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-md">
-                    <TrendingUp className="w-3 h-3" /> +12.5%
-                  </span>
-                  <span className="text-[11px] text-gray-400">vs. last month</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 2 */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-36">
-              <div className="flex justify-between items-start mb-2">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Waste Rate</p>
-                <div className="p-1.5 bg-gray-50 border border-gray-100 rounded-md">
-                  <Trash2 className="w-4 h-4 text-gray-600" />
-                </div>
-              </div>
-              <div>
-                <p className="text-3xl font-bold font-serif text-gray-900 mb-3">2.8%</p>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1 text-[11px] font-bold text-red-600 bg-red-50 px-2 py-0.5 rounded-md">
-                    <TrendingDown className="w-3 h-3" /> -0.5%
-                  </span>
-                  <span className="text-[11px] text-gray-400">of total inventory</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Card 3 */}
-            <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between h-36">
-              <div className="flex justify-between items-start mb-2">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Total COGS</p>
-                <div className="p-1.5 bg-gray-50 border border-gray-100 rounded-md">
-                  <Layers className="w-4 h-4 text-gray-600" />
-                </div>
-              </div>
-              <div>
-                <p className="text-3xl font-bold font-serif text-gray-900 mb-3">₱14,280</p>
-                <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-1 text-[11px] font-bold text-gray-800 bg-gray-100 px-2 py-0.5 rounded-md">
-                    <TrendingUp className="w-3 h-3" /> +3.2%
-                  </span>
-                  <span className="text-[11px] text-gray-400">Cost of Goods Sold</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Top Stats Cards (reused from inventory StatCards) */}
+          <StatCards
+            cards={[
+              { icon: TrendingUp, label: 'Stock Turnover', value: '8.4x', sub: 'vs. last month', accent: '#3D261D', iconBg: 'bg-gray-100', iconColor: '#374151' },
+              { icon: Trash2, label: 'Waste Rate', value: '2.8%', sub: 'of total inventory', accent: '#DC2626', iconBg: 'bg-red-50', iconColor: '#B91C1C' },
+              { icon: Layers, label: 'Total COGS', value: '₱14,280', sub: 'Cost of Goods Sold', accent: '#6B7280', iconBg: 'bg-gray-100', iconColor: '#374151' },
+            ]}
+          />
 
           {/* Middle Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
