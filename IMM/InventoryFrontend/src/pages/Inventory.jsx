@@ -234,94 +234,102 @@ export default function Inventory() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormError('');
-    const session = getAuthSession();
-    if (!session?.token) { setFormError('Session expired. Please login again.'); return; }
-    
-    const itemName = newItem.itemName.trim();
-    const costPerUnit = Number(newItem.costPerUnit);
-    const minimumStock = Number(newItem.minimumStock);
-    const quantity = Number(newItem.initialStock);
+  e.preventDefault();
+  setFormError('');
+  const session = getAuthSession();
+  if (!session?.token) {
+    setFormError('Session expired. Please login again.');
+    return;
+  }
 
-    // Validation checks
-    if (!itemName) {
-      toast.error('Item name is required.');
-      return;
-    }
-    if (itemName.length < 2) {
-      toast.error('Item name must be at least 2 characters.');
-      return;
-    }
-    if (itemName.length > 100) {
-      toast.error('Item name cannot exceed 100 characters.');
-      return;
-    }
-    if (!newItem.costPerUnit || Number.isNaN(costPerUnit)) {
-      toast.error('Cost per unit is required and must be a valid number.');
-      return;
-    }
-    if (costPerUnit < 0) {
-      toast.error('Cost per unit cannot be negative.');
-      return;
-    }
-    if (costPerUnit > 999999) {
-      toast.error('Cost per unit is too high.');
-      return;
-    }
-    if (!newItem.minimumStock || Number.isNaN(minimumStock)) {
-      toast.error('Minimum stock is required and must be a valid number.');
-      return;
-    }
-    if (minimumStock < 0) {
-      toast.error('Minimum stock cannot be negative.');
-      return;
-    }
-    if (!newItem.initialStock || Number.isNaN(quantity)) {
-      toast.error('Current stock is required and must be a valid number.');
-      return;
-    }
-    if (quantity < 0) {
-      toast.error('Current stock cannot be negative.');
-      return;
-    }
-    if (!newItem.category) {
-      toast.error('Please select a category.');
-      return;
-    }
-    if (!newItem.unit) {
-      toast.error('Please select a unit.');
-      return;
-    }
+  const itemName = newItem.itemName.trim();
+  const costPerUnit = parseFloat(newItem.costPerUnit);
+  const minimumStock = parseInt(newItem.minimumStock, 10);
 
-    try {
-      if (drawerMode === 'add') {
-        const normalizedName = itemName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6) || 'ITEM';
-        const sku = `${normalizedName}${Date.now().toString().slice(-6)}`;
-        const result = await createInventoryItem(session.token, {
-          name: itemName, sku, category: categoryToBackend[newItem.category] || 'other',
-          quantity: Math.floor(quantity), unit: newItem.unit,
-          lowStockThreshold: Math.floor(minimumStock), costPrice: costPerUnit, supplier: '',
-        });
-        if (result?.data) setInventoryItems((prev) => [mapItemToUi(result.data), ...prev]);
-        toast.success('Item created successfully');
-      } else {
-        const result = await updateInventoryItem(session.token, newItem.id, {
-          name: itemName,
-          category: categoryToBackend[newItem.category] || 'other',
-          quantity: Math.floor(quantity),
-          unit: newItem.unit,
-          lowStockThreshold: Math.floor(minimumStock),
-          costPrice: costPerUnit,
-        });
-        if (result?.data) {
-          setInventoryItems((prev) => prev.map((item) => item.id === newItem.id ? mapItemToUi(result.data) : item));
-        }
-        toast.success('Item updated successfully');
+  // Validation checks
+  if (!itemName) {
+    toast.error('Item name is required.');
+    return;
+  }
+  if (itemName.length < 2) {
+    toast.error('Item name must be at least 2 characters.');
+    return;
+  }
+  if (itemName.length > 100) {
+    toast.error('Item name cannot exceed 100 characters.');
+    return;
+  }
+  if (!newItem.costPerUnit || isNaN(costPerUnit)) {
+    toast.error('Cost per unit is required and must be a valid number.');
+    return;
+  }
+  if (costPerUnit < 0) {
+    toast.error('Cost per unit cannot be negative.');
+    return;
+  }
+  if (costPerUnit > 999999) {
+    toast.error('Cost per unit is too high.');
+    return;
+  }
+  if (!newItem.minimumStock || isNaN(minimumStock)) {
+    toast.error('Minimum stock is required and must be a valid number.');
+    return;
+  }
+  if (minimumStock < 0) {
+    toast.error('Minimum stock cannot be negative.');
+    return;
+  }
+  if (!newItem.category) {
+    toast.error('Please select a category.');
+    return;
+  }
+  if (!newItem.unit) {
+    toast.error('Please select a unit.');
+    return;
+  }
+
+  try {
+    if (drawerMode === 'add') {
+      // Generate SKU for new items
+      const normalizedName = itemName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6) || 'ITEM';
+      const sku = `${normalizedName}${Date.now().toString().slice(-6)}`;
+
+      const result = await createInventoryItem(session.token, {
+  name: itemName,
+  sku,
+  category: categoryToBackend[newItem.category] || 'other',
+  unit: newItem.unit,
+  quantity: 0,                // Start at 0 since no initial stock input
+  lowStockThreshold: minimumStock,
+  costPrice: costPerUnit,
+  supplier: '',               // or null if you prefer
+});
+
+      if (result?.data) setInventoryItems((prev) => [mapItemToUi(result.data), ...prev]);
+      toast.success('Item created successfully');
+    } else {
+      // Update existing item
+      const result = await updateInventoryItem(session.token, newItem.id, {
+        name: itemName,
+        category: categoryToBackend[newItem.category] || 'other',
+        unit: newItem.unit,
+        lowStockThreshold: minimumStock,
+        costPrice: costPerUnit,
+      });
+
+      if (result?.data) {
+        setInventoryItems((prev) =>
+          prev.map((item) => (item.id === newItem.id ? mapItemToUi(result.data) : item))
+        );
       }
-      closeDrawer();
-    } catch (error) { toast.error(error?.message || 'Cannot connect to backend. Please check server connection.'); }
-  };
+      toast.success('Item updated successfully');
+    }
+
+    closeDrawer();
+  } catch (error) {
+    toast.error(error?.message || 'Cannot connect to backend. Please check server connection.');
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#F7F4F0] w-full px-4 sm:px-6 lg:px-10 py-6 lg:py-9">
