@@ -24,7 +24,6 @@ export default function ItemDrawer({
       ]
     : [
         { label: 'Item Name', field: 'itemName', type: 'text', placeholder: 'e.g. Arabica Beans' },
-        { label: 'Initial Stock', field: 'initialStock', type: 'number', placeholder: 'e.g. 10' },
         { label: 'Cost per Unit', field: 'costPerUnit', type: 'number', placeholder: 'e.g. 12.50' },
         { label: 'Minimum Stock', field: 'minimumStock', type: 'number', placeholder: 'e.g. 50' },
       ];
@@ -105,7 +104,7 @@ export default function ItemDrawer({
                 <Dropdown
                   value={item.category}
                   onChange={(val) => setItem((p) => ({ ...p, category: val }))}
-                  options={['Beans', 'Milk', 'Syrup', 'Cups', 'Pastries']}
+                  options={['Beans', 'Milk', 'Syrup', 'Cups', 'Pastries', 'Powder']}
                   placeholder="Select category"
                 />
               </div>
