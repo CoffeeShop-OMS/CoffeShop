@@ -315,9 +315,10 @@ export default function Inventory() {
 
   try {
     if (drawerMode === 'add') {
-      // Generate SKU for new items
-      const normalizedName = itemName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6) || 'ITEM';
-      const sku = `${normalizedName}${Date.now().toString().slice(-6)}`;
+      // Generate SKU for new items - 3 letter prefix from name + hyphen + 3 random digits
+      const prefix = itemName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 3).padEnd(3, 'X');
+      const number = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      const sku = `${prefix}-${number}`;
 
       const result = await createInventoryItem(session.token, {
   name: itemName,

@@ -48,7 +48,7 @@ export default function InventoryTable({
             <th className="w-12 text-center px-4 py-3">
               <input type="checkbox" checked={allSelected} onChange={handleSelectAll} className="accent-[#3D261D] rounded" />
             </th>
-            {['Item Details', 'Category', 'Stock', 'Reorder Level', 'Current Value', 'Maximum Value', 'Status', 'Actions'].map((h) => (
+            {['Item', 'SKU', 'Category', 'Stock', 'Reorder Level', 'Current Value', 'Maximum Value', 'Status', 'Actions'].map((h) => (
               <th key={h} className="px-4 py-3 text-left text-[10px] font-bold text-[#A89080] uppercase tracking-widest whitespace-nowrap">{h}</th>
             ))}
           </tr>
@@ -56,13 +56,13 @@ export default function InventoryTable({
         <tbody>
           {isLoading ? (
             <tr>
-              <td colSpan={9} className="text-center text-[#A89080] py-12 text-sm">
+              <td colSpan={10} className="text-center text-[#A89080] py-12 text-sm">
                 Loading inventory…
               </td>
             </tr>
           ) : items.length === 0 ? (
             <tr>
-              <td colSpan={9} className="text-center text-[#A89080] py-12 text-sm">
+              <td colSpan={10} className="text-center text-[#A89080] py-12 text-sm">
                 No items found.
               </td>
             </tr>
@@ -81,7 +81,9 @@ export default function InventoryTable({
                   </td>
                   <td className="px-4 py-3.5">
                     <p className="text-sm font-semibold text-[#1C100A]">{item.name}</p>
-                    <p className="text-[11px] text-[#C4B8B0] font-medium mt-0.5 font-mono">{item.sku}</p>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <p className="text-sm font-mono text-[#7A6355]">{item.sku}</p>
                   </td>
                   <td className="px-4 py-3.5">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${cc.bg} ${cc.text} ${cc.border}`}>

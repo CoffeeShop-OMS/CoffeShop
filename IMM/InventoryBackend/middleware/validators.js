@@ -55,8 +55,8 @@ const createItemValidator = [
   body("sku")
     .optional({ values: "falsy" })
     .trim()
-    .isAlphanumeric()
-    .withMessage("SKU must be alphanumeric"),
+    .matches(/^[a-zA-Z0-9-]*$/)
+    .withMessage("SKU must contain only letters, numbers, and hyphens"),
   body("category")
     .trim()
     .notEmpty()

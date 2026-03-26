@@ -20,18 +20,19 @@ const categoryToBackend = {
 const sanitizeSku = (value = "") =>
   String(value)
     .trim()
-    .replace(/[^a-zA-Z0-9]/g, "")
+    .replace(/[^a-zA-Z0-9-]/g, "")
     .toUpperCase();
 
-const generateSku = (name = "ITEM", suffix = Date.now().toString().slice(-6)) => {
+const generateSku = (name = "ITEM", suffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0')) => {
   const prefix =
     String(name)
       .trim()
       .replace(/[^a-zA-Z0-9]/g, "")
       .toUpperCase()
-      .slice(0, 6) || "ITEM";
+      .slice(0, 3)
+      .padEnd(3, 'X');
 
-  return `${prefix}${suffix}`;
+  return `${prefix}-${suffix}`;
 };
 
 // ─── Helper ───────────────────────────────────────────────────────────────────
@@ -89,7 +90,7 @@ const createItem = async (req, res) => {
       }
 
       attempts += 1;
-      const randomSuffix = `${Date.now().toString().slice(-4)}${Math.floor(Math.random() * 90 + 10)}`;
+      const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
       finalSku = generateSku(cleanName, randomSuffix);
     }
 
