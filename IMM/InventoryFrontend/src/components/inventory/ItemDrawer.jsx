@@ -21,12 +21,14 @@ export default function ItemDrawer({
         { label: 'Current Stock', field: 'initialStock', type: 'number', placeholder: 'e.g. 10' },
         { label: 'Cost per Unit', field: 'costPerUnit', type: 'number', placeholder: 'e.g. 12.50' },
         { label: 'Minimum Stock', field: 'minimumStock', type: 'number', placeholder: 'e.g. 50' },
+        { label: 'Expiration Date', field: 'expirationDate', type: 'date', placeholder: '' },
       ]
     : [
         { label: 'Item Name', field: 'itemName', type: 'text', placeholder: 'e.g. Arabica Beans' },
         { label: 'Stock Level', field: 'initialStock', type: 'number', placeholder: 'e.g. 120' },
         { label: 'Cost per Unit', field: 'costPerUnit', type: 'number', placeholder: 'e.g. 12.50' },
         { label: 'Minimum Stock', field: 'minimumStock', type: 'number', placeholder: 'e.g. 50' },
+        { label: 'Expiration Date', field: 'expirationDate', type: 'date', placeholder: '' },
       ];
 
   return (
@@ -94,7 +96,7 @@ export default function ItemDrawer({
                   }}
                   className={inputCls}
                   placeholder={placeholder}
-                  required
+                  required={field !== 'expirationDate'}
                 />
               </div>
             ))}

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Filter, Search, X, ChevronRight, MoreVertical, Coffee, Archive, Package, AlertTriangle, TrendingDown, RefreshCcw } from 'lucide-react';
+import { Filter, Search, X, ChevronRight, MoreVertical, Coffee, Archive, Package, AlertTriangle, TrendingDown, RefreshCcw, PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { getAuthSession } from '../utils/authStorage';
 import { createInventoryItem, updateInventoryItem, deleteInventoryItem, getInventory } from '../services/api';
@@ -141,10 +141,22 @@ export default function Inventory() {
   const [currentPage,     setCurrentPage]     = useState(1);
   const [selectedItems,   setSelectedItems]   = useState(new Set());
   const [isBulkDeleting,  setIsBulkDeleting]  = useState(false);
+  const [recentActivities, setRecentActivities] = useState([]);
   const itemsPerPage = 10;
   const [newItem, setNewItem] = useState({
-    itemName: '', sku: '', category: 'Beans', unit: 'pcs', costPerUnit: '', minimumStock: '', initialStock: '',
+    itemName: '', sku: '', category: 'Beans', unit: 'pcs', costPerUnit: '', minimumStock: '', initialStock: '', expirationDate: '',
   });
+
+  // Helper function to add activity log
+  const addActivity = (type, itemName) => {
+    const activity = {
+      id: Math.random(),
+      type, // 'created', 'updated', 'deleted'
+      itemName,
+      timestamp: new Date(),
+    };
+    setRecentActivities((prev) => [activity, ...prev].slice(0, 10)); // Keep last 10 activities
+  };
 
   // Helper function to normalize item names for comparison
   const normalizeNameForComparison = (name) => {
@@ -229,13 +241,13 @@ export default function Inventory() {
     setIsDrawerOpen(false);
     setDrawerMode('add');
     setFormError('');
-    setNewItem({ itemName: '', sku: '', category: 'Beans', unit: 'pcs', costPerUnit: '', minimumStock: '', initialStock: '' });
+    setNewItem({ itemName: '', sku: '', category: 'Beans', unit: 'pcs', costPerUnit: '', minimumStock: '', initialStock: '', expirationDate: '' });
     clearDuplicatePrompt();
   };
 
   const handleAddClick = () => {
     setDrawerMode('add');
-    setNewItem({ itemName: '', sku: '', category: 'Beans', unit: 'pcs', costPerUnit: '', minimumStock: '', initialStock: '' });
+    setNewItem({ itemName: '', sku: '', category: 'Beans', unit: 'pcs', costPerUnit: '', minimumStock: '', initialStock: '', expirationDate: '' });
     setFormError('');
     setIsDrawerOpen(true);
   };
@@ -251,6 +263,7 @@ export default function Inventory() {
       costPerUnit: item.costPrice.toString(),
       minimumStock: item.threshold.toString(),
       initialStock: item.quantity.toString(),
+      expirationDate: item.expirationDate || '',
     });
     setFormError('');
     setIsDrawerOpen(true);
@@ -281,6 +294,7 @@ export default function Inventory() {
         return next;
       });
       setShowDeleteModal(false);
+      addActivity('deleted', itemToDelete.name);
       setItemToDelete(null);
       toast.success('Item archived successfully');
     } catch (error) { toast.error(error?.message || 'Cannot connect to backend. Please check server connection.'); }
@@ -308,6 +322,9 @@ export default function Inventory() {
       );
       setSelectedItems(new Set());
       setCurrentPage(1);
+      inventoryItems
+        .filter((item) => itemIds.includes(item.id))
+        .forEach((item) => addActivity('deleted', item.name));
       toast.success(`${itemIds.length} item(s) archived successfully`);
     } catch (error) { toast.error(error?.message || 'Failed to archive items'); }
     finally { setIsBulkDeleting(false); }
@@ -319,7 +336,7 @@ export default function Inventory() {
     setPendingCreateInput(null);
   }
 
-  const submitCreateItem = async ({ token, itemName, category, unit, initialStock, minimumStock, costPerUnit }) => {
+  const submitCreateItem = async ({ token, itemName, category, unit, initialStock, minimumStock, costPerUnit, expirationDate }) => {
     const rawPrefix = (itemName.match(/[a-zA-Z]+/)?.[0] || 'Item').slice(0, 12);
     const prefix = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1).toLowerCase();
     const number = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
@@ -334,9 +351,13 @@ export default function Inventory() {
       lowStockThreshold: minimumStock,
       costPrice: costPerUnit,
       supplier: '',
+      expirationDate: expirationDate || null,
     });
 
-    if (result?.data) setInventoryItems((prev) => [mapItemToUi(result.data), ...prev]);
+    if (result?.data) {
+      setInventoryItems((prev) => [mapItemToUi(result.data), ...prev]);
+      addActivity('created', itemName);
+    }
     toast.success('Item created successfully');
     closeDrawer();
   };
@@ -467,6 +488,7 @@ export default function Inventory() {
         initialStock,
         minimumStock,
         costPerUnit,
+        expirationDate: newItem.expirationDate,
       });
       setShowDuplicateModal(true);
       return;
@@ -483,6 +505,7 @@ export default function Inventory() {
         initialStock,
         minimumStock,
         costPerUnit,
+        expirationDate: newItem.expirationDate,
       });
     } else {
       // Update existing item
@@ -493,12 +516,14 @@ export default function Inventory() {
         unit: newItem.unit,
         lowStockThreshold: minimumStock,
         costPrice: costPerUnit,
+        expirationDate: newItem.expirationDate || null,
       });
 
       if (result?.data) {
         setInventoryItems((prev) =>
           prev.map((item) => (item.id === newItem.id ? mapItemToUi(result.data) : item))
         );
+        addActivity('updated', itemName);
       }
       toast.success('Item updated successfully');
       closeDrawer();
@@ -645,6 +670,83 @@ export default function Inventory() {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── Recent Activity Section ── */}
+      <div className="mt-6 sm:mt-8 bg-white rounded-2xl border border-[#EAE5E0] shadow-sm overflow-hidden">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-[#F0EDE8] bg-[#FDFCFB]">
+          <h3 className="text-sm font-bold text-[#1C100A]">Recent Activity</h3>
+          <p className="text-xs text-[#9E8A7A] mt-1">Live inventory operations</p>
+        </div>
+        {recentActivities.length > 0 ? (
+          <div className="divide-y divide-[#F0EDE8]">
+            {recentActivities.map((activity) => {
+              const getActivityIcon = () => {
+                switch (activity.type) {
+                  case 'created':
+                    return <PlusCircle className="w-4 h-4 text-emerald-600" />;
+                  case 'updated':
+                    return <Edit2 className="w-4 h-4 text-blue-600" />;
+                  case 'deleted':
+                    return <Trash2 className="w-4 h-4 text-red-600" />;
+                  default:
+                    return null;
+                }
+              };
+
+              const getActivityBg = () => {
+                switch (activity.type) {
+                  case 'created':
+                    return 'bg-emerald-50';
+                  case 'updated':
+                    return 'bg-blue-50';
+                  case 'deleted':
+                    return 'bg-red-50';
+                  default:
+                    return 'bg-gray-50';
+                }
+              };
+
+              const getActivityLabel = () => {
+                switch (activity.type) {
+                  case 'created':
+                    return 'Item Created';
+                  case 'updated':
+                    return 'Item Updated';
+                  case 'deleted':
+                    return 'Item Archived';
+                  default:
+                    return 'Activity';
+                }
+              };
+
+              const formatTime = (timestamp) => {
+                return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              };
+
+              return (
+                <div key={activity.id} className="px-4 sm:px-6 py-3 sm:py-4 flex items-start gap-3 hover:bg-[#FDFCFB] transition">
+                  <div className={`${getActivityBg()} p-2 rounded-lg`}>
+                    {getActivityIcon()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[#1C100A]">{getActivityLabel()}</p>
+                    <p className="text-xs text-[#9E8A7A] truncate">{activity.itemName}</p>
+                  </div>
+                  <div className="text-xs text-[#C4B8B0] whitespace-nowrap">
+                    {formatTime(activity.timestamp)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="px-4 sm:px-6 py-8 sm:py-10 text-center">
+            <Coffee className="w-8 h-8 text-[#C4B8B0] mx-auto mb-3 opacity-50" />
+            <p className="text-sm text-[#9E8A7A] font-medium">No activity yet</p>
+            <p className="text-xs text-[#C4B8B0] mt-1">Inventory operations will appear here</p>
+          </div>
+        )}
       </div>
 
       {/* ── Footer ── */}
