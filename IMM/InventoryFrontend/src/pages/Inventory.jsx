@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Filter, Search, X, ChevronRight, MoreVertical, Coffee, Archive, Package, AlertTriangle, TrendingDown, RefreshCcw, PlusCircle, Edit2, Trash2 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Filter, Search, X, ChevronRight, MoreVertical, Coffee, Archive, Package, AlertTriangle, TrendingDown, RefreshCcw, PlusCircle, Edit2, Trash2, DollarSign, TrendingUp } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { getAuthSession } from '../utils/authStorage';
-import { createInventoryItem, updateInventoryItem, deleteInventoryItem, getInventory } from '../services/api';
+import { createInventoryItem, updateInventoryItem, deleteInventoryItem, getInventory, getInventoryLogs } from '../services/api';
 import Dropdown from '../components/Dropdown';
 import InventoryHeader from '../components/inventory/InventoryHeader';
 import InventoryAlertBanner from '../components/inventory/InventoryAlertBanner';
@@ -123,6 +124,7 @@ const exportToCSV = (items) => {
 };
 
 export default function Inventory() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isDrawerOpen,    setIsDrawerOpen]    = useState(false);
   const [drawerMode,      setDrawerMode]      = useState('add'); // 'add' or 'edit'
   const [formError,       setFormError]       = useState('');
@@ -131,6 +133,8 @@ export default function Inventory() {
   const [searchTerm,      setSearchTerm]      = useState('');
   const [categoryFilter,  setCategoryFilter]  = useState('All');
   const [statusFilter,    setStatusFilter]    = useState('Active');
+  const [sortBy,          setSortBy]          = useState('name');
+  const [sortOrder,       setSortOrder]       = useState('asc');
   const [inventoryItems,  setInventoryItems]  = useState([]);
   const [showFilters,     setShowFilters]     = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -142,20 +146,125 @@ export default function Inventory() {
   const [selectedItems,   setSelectedItems]   = useState(new Set());
   const [isBulkDeleting,  setIsBulkDeleting]  = useState(false);
   const [recentActivities, setRecentActivities] = useState([]);
+  const [recentPage, setRecentPage] = useState(1);
   const itemsPerPage = 10;
+  const recentActivitiesPerPage = 5;
   const [newItem, setNewItem] = useState({
     itemName: '', sku: '', category: 'Beans', unit: 'pcs', costPerUnit: '', minimumStock: '', initialStock: '', expirationDate: '',
   });
 
+  const RECENT_ACTIVITIES_STORAGE_KEY = 'inventoryRecentActivities';
+
+  const parseTimestamp = (timestamp) => {
+    if (!timestamp) return new Date();
+    if (typeof timestamp.toDate === 'function') return timestamp.toDate();
+    if (typeof timestamp === 'object' && (timestamp._seconds || timestamp.seconds)) {
+      return new Date((timestamp._seconds || timestamp.seconds) * 1000);
+    }
+    return new Date(timestamp);
+  };
+
+  const normalizeActivityType = (action) => {
+    switch ((action || '').toString().toUpperCase()) {
+      case 'CREATE': return 'created';
+      case 'UPDATE': return 'updated';
+      case 'DELETE': return 'deleted';
+      case 'STOCK_ADJUST': return 'adjusted';
+      default: return 'activity';
+    }
+  };
+
+  const buildActivityDescription = (activity) => {
+    if (activity.type === 'adjusted') {
+      const adjustment = Number(activity.details?.adjustment || 0);
+      const absAdjustment = Math.abs(adjustment);
+      const direction = adjustment > 0 ? 'Restocked' : 'Consumed';
+      const units = activity.details?.unit || '';
+      const reason = activity.details?.reason ? ` · ${activity.details.reason}` : '';
+      return `${direction} ${absAdjustment}${units} ${reason}`.trim();
+    }
+
+    if (activity.type === 'created') {
+      return activity.details?.reason ? `Created · ${activity.details.reason}` : 'Created item';
+    }
+
+    if (activity.type === 'updated') {
+      return activity.details?.reason ? `Updated · ${activity.details.reason}` : 'Updated item details';
+    }
+
+    if (activity.type === 'deleted') {
+      return activity.details?.reason ? `Archived · ${activity.details.reason}` : 'Archived item';
+    }
+
+    return activity.details?.reason || 'Inventory activity';
+  };
+
+  const sanitizeStoredActivity = (activity) => {
+    return {
+      id: activity.id,
+      type: activity.type,
+      itemName: activity.itemName,
+      timestamp: parseTimestamp(activity.timestamp).toISOString(),
+      details: activity.details || {},
+      source: activity.source || 'local',
+    };
+  };
+
+  const saveRecentActivities = (activities) => {
+    try {
+      window.localStorage.setItem(RECENT_ACTIVITIES_STORAGE_KEY, JSON.stringify(activities.map(sanitizeStoredActivity)));
+    } catch {
+      // ignore storage failures
+    }
+  };
+
   // Helper function to add activity log
-  const addActivity = (type, itemName) => {
+  const addActivity = (type, itemName, details = {}) => {
     const activity = {
-      id: Math.random(),
-      type, // 'created', 'updated', 'deleted'
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      type,
       itemName,
       timestamp: new Date(),
+      details,
+      source: 'local',
     };
-    setRecentActivities((prev) => [activity, ...prev].slice(0, 10)); // Keep last 10 activities
+    setRecentActivities((prev) => {
+      const next = [activity, ...prev].slice(0, 10);
+      saveRecentActivities(next);
+      return next;
+    });
+  };
+
+  const loadStoredActivities = () => {
+    try {
+      const raw = window.localStorage.getItem(RECENT_ACTIVITIES_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .map((activity) => ({
+          ...activity,
+          timestamp: parseTimestamp(activity.timestamp),
+        }))
+        .slice(0, 10);
+    } catch {
+      return [];
+    }
+  };
+
+  const transformLogToActivity = (log) => {
+    const type = normalizeActivityType(log.action);
+    return {
+      id: log.id,
+      type,
+      itemName: log.itemName || log.details?.itemName || 'Unknown item',
+      timestamp: parseTimestamp(log.timestamp),
+      details: {
+        ...log.details,
+        action: log.action,
+      },
+      source: 'remote',
+    };
   };
 
   // Helper function to normalize item names for comparison
@@ -169,21 +278,69 @@ export default function Inventory() {
 
   const filteredItems = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    return inventoryItems.filter((item) => {
+    const filter = searchParams.get('filter');
+
+    let filtered = inventoryItems.filter((item) => {
       const matchCat    = categoryFilter === 'All' || item.cat === categoryFilter;
       const matchSearch = !term || item.name.toLowerCase().includes(term) || item.sku.toLowerCase().includes(term);
       const matchStatus =
         statusFilter === 'All' ||
         (statusFilter === 'Active' && !item.isArchived) ||
         (statusFilter === 'Archived' && item.isArchived);
-      return matchCat && matchSearch && matchStatus;
-    });
-  }, [inventoryItems, searchTerm, categoryFilter, statusFilter]);
 
-  // Reset to page 1 when filters change
+      // Additional filtering for dashboard navigation
+      let matchDashboardFilter = true;
+      if (filter === 'low-stock') {
+        matchDashboardFilter = item.isLow && !item.isArchived;
+      } else if (filter === 'out-of-stock') {
+        matchDashboardFilter = item.isOut && !item.isArchived;
+      }
+
+      return matchCat && matchSearch && matchStatus && matchDashboardFilter;
+    });
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      let aValue, bValue;
+
+      switch (sortBy) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'dateAdded':
+          aValue = new Date(a.dateAdded);
+          bValue = new Date(b.dateAdded);
+          break;
+        case 'category':
+          aValue = a.cat.toLowerCase();
+          bValue = b.cat.toLowerCase();
+          break;
+        case 'quantity':
+          aValue = a.quantity;
+          bValue = b.quantity;
+          break;
+        case 'value':
+          aValue = a.currentValue;
+          bValue = b.currentValue;
+          break;
+        default:
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+      }
+
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return filtered;
+  }, [inventoryItems, searchTerm, categoryFilter, statusFilter, sortBy, sortOrder]);
+
+  // Reset to page 1 when filters or sorting change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, categoryFilter, statusFilter]);
+  }, [searchTerm, categoryFilter, statusFilter, sortBy, sortOrder]);
 
   // Calculate paginated items
   const paginatedItems = useMemo(() => {
@@ -203,8 +360,22 @@ export default function Inventory() {
       outCount: activeItems.filter((i) => i.isOut).length,
       archivedCount: archivedItems.length,
       value: activeItems.reduce((s, i) => s + i.quantity * i.costPrice, 0),
+      maxValue: activeItems.reduce((s, i) => s + i.threshold * i.costPrice, 0),
     };
   }, [inventoryItems]);
+
+  const recentTotalPages = Math.ceil(recentActivities.length / recentActivitiesPerPage);
+
+  useEffect(() => {
+    if (recentPage > recentTotalPages) {
+      setRecentPage(recentTotalPages || 1);
+    }
+  }, [recentPage, recentTotalPages]);
+
+  const paginatedRecentActivities = useMemo(() => {
+    const startIndex = (recentPage - 1) * recentActivitiesPerPage;
+    return recentActivities.slice(startIndex, startIndex + recentActivitiesPerPage);
+  }, [recentActivities, recentPage]);
 
   const selectedActiveCount = useMemo(() => {
     if (selectedItems.size === 0) return 0;
@@ -217,7 +388,8 @@ export default function Inventory() {
       { icon: AlertTriangle, label: 'Low Stock', value: stats?.lowCount?.toString() ?? '0', sub: 'Need attention', accent: '#B45309', iconBg: 'bg-amber-100', iconColor: '#B45309' },
       { icon: TrendingDown, label: 'Out of Stock', value: stats?.outCount?.toString() ?? '0', sub: 'Need replenishment', accent: '#DC2626', iconBg: 'bg-red-100', iconColor: '#DC2626' },
       { icon: Archive, label: 'Archived', value: stats?.archivedCount?.toString() ?? '0', sub: 'Hidden from active inventory', accent: '#6B7280', iconBg: 'bg-slate-100', iconColor: '#475569' },
-      { icon: RefreshCcw, label: 'Inventory Value', value: stats ? `₱${Number(stats.value || 0).toFixed(2)}` : '₱0.00', sub: 'Active inventory valuation', accent: '#059669', iconBg: 'bg-emerald-100', iconColor: '#059669' },
+      { icon: DollarSign, label: 'Current Value', value: stats ? `₱${Number(stats.value || 0).toFixed(2)}` : '₱0.00', sub: 'Current inventory value', accent: '#059669', iconBg: 'bg-emerald-100', iconColor: '#059669' },
+      { icon: TrendingUp, label: 'Maximum Value', value: stats ? `₱${Number(stats.maxValue || 0).toFixed(2)}` : '₱0.00', sub: 'Value at full capacity', accent: '#7C3AED', iconBg: 'bg-purple-100', iconColor: '#7C3AED' },
     ],
     [stats]
   );
@@ -235,6 +407,74 @@ export default function Inventory() {
       } finally { setIsLoadingItems(false); }
     };
     loadItems();
+  }, []);
+
+  // Handle URL parameters for filtering/sorting from dashboard navigation
+  useEffect(() => {
+    const status = searchParams.get('status');
+    const filter = searchParams.get('filter');
+    const sort = searchParams.get('sort');
+
+    if (status) {
+      setStatusFilter(status);
+    }
+
+    if (filter) {
+      switch (filter) {
+        case 'low-stock':
+          // Filter for low stock items - this will be handled in the filteredItems useMemo
+          setStatusFilter('Active');
+          break;
+        case 'out-of-stock':
+          // Filter for out of stock items - this will be handled in the filteredItems useMemo
+          setStatusFilter('Active');
+          break;
+      }
+    }
+
+    if (sort) {
+      switch (sort) {
+        case 'value-desc':
+          setSortBy('value');
+          setSortOrder('desc');
+          break;
+        case 'name-asc':
+          setSortBy('name');
+          setSortOrder('asc');
+          break;
+        case 'name-desc':
+          setSortBy('name');
+          setSortOrder('desc');
+          break;
+      }
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const loadRecentActivities = async () => {
+      const stored = loadStoredActivities();
+      if (stored.length > 0) {
+        setRecentActivities(stored);
+      }
+
+      const session = getAuthSession();
+      if (!session?.token) return;
+      try {
+        const result = await getInventoryLogs(session.token, { limit: 10, days: 30 });
+        const logs = Array.isArray(result?.data) ? result.data : [];
+        const activities = logs
+          .map(transformLogToActivity)
+          .sort((a, b) => b.timestamp - a.timestamp)
+          .slice(0, 10);
+        if (activities.length > 0) {
+          setRecentActivities(activities);
+          saveRecentActivities(activities);
+        }
+      } catch (error) {
+        // keep local storage activity if backend load fails
+      }
+    };
+    loadRecentActivities();
   }, []);
 
   const closeDrawer = () => {
@@ -603,6 +843,35 @@ export default function Inventory() {
                     className="text-sm font-semibold text-[#3D261D]"
                   />
                 </div>
+                <span className="text-xs text-[#9E8A7A] font-medium whitespace-nowrap">Sort by:</span>
+                <div className="w-36">
+                  <Dropdown
+                    value={sortBy}
+                    onChange={setSortBy}
+                    options={[
+                      { value: 'name', label: 'Name A-Z' },
+                      { value: 'dateAdded', label: 'Date Added' },
+                      { value: 'category', label: 'Category' },
+                      { value: 'quantity', label: 'Quantity' },
+                      { value: 'value', label: 'Value' }
+                    ]}
+                    placeholder="Sort by"
+                    className="text-sm font-semibold text-[#3D261D]"
+                  />
+                </div>
+                <span className="text-xs text-[#9E8A7A] font-medium whitespace-nowrap">Order:</span>
+                <div className="w-24">
+                  <Dropdown
+                    value={sortOrder}
+                    onChange={setSortOrder}
+                    options={[
+                      { value: 'asc', label: '↑ Asc' },
+                      { value: 'desc', label: '↓ Desc' }
+                    ]}
+                    placeholder="Order"
+                    className="text-sm font-semibold text-[#3D261D]"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -622,6 +891,29 @@ export default function Inventory() {
                 onChange={setStatusFilter}
                 options={['Active', 'Archived', 'All']}
                 placeholder="Select view"
+              />
+              <span className="text-xs text-[#9E8A7A] font-medium mt-1">Sort by:</span>
+              <Dropdown
+                value={sortBy}
+                onChange={setSortBy}
+                options={[
+                  { value: 'name', label: 'Name A-Z' },
+                  { value: 'dateAdded', label: 'Date Added' },
+                  { value: 'category', label: 'Category' },
+                  { value: 'quantity', label: 'Quantity' },
+                  { value: 'value', label: 'Value' }
+                ]}
+                placeholder="Sort by"
+              />
+              <span className="text-xs text-[#9E8A7A] font-medium mt-1">Order:</span>
+              <Dropdown
+                value={sortOrder}
+                onChange={setSortOrder}
+                options={[
+                  { value: 'asc', label: '↑ Ascending' },
+                  { value: 'desc', label: '↓ Descending' }
+                ]}
+                placeholder="Order"
               />
             </div>
           )}
@@ -679,8 +971,9 @@ export default function Inventory() {
           <p className="text-xs text-[#9E8A7A] mt-1">Live inventory operations</p>
         </div>
         {recentActivities.length > 0 ? (
-          <div className="divide-y divide-[#F0EDE8]">
-            {recentActivities.map((activity) => {
+          <>
+            <div className="divide-y divide-[#F0EDE8]">
+              {paginatedRecentActivities.map((activity) => {
               const getActivityIcon = () => {
                 switch (activity.type) {
                   case 'created':
@@ -689,6 +982,8 @@ export default function Inventory() {
                     return <Edit2 className="w-4 h-4 text-blue-600" />;
                   case 'deleted':
                     return <Trash2 className="w-4 h-4 text-red-600" />;
+                  case 'adjusted':
+                    return <RefreshCcw className="w-4 h-4 text-amber-600" />;
                   default:
                     return null;
                 }
@@ -702,6 +997,8 @@ export default function Inventory() {
                     return 'bg-blue-50';
                   case 'deleted':
                     return 'bg-red-50';
+                  case 'adjusted':
+                    return 'bg-amber-50';
                   default:
                     return 'bg-gray-50';
                 }
@@ -715,8 +1012,10 @@ export default function Inventory() {
                     return 'Item Updated';
                   case 'deleted':
                     return 'Item Archived';
+                  case 'adjusted':
+                    return 'Stock Adjusted';
                   default:
-                    return 'Activity';
+                    return 'Inventory Activity';
                 }
               };
 
@@ -731,7 +1030,8 @@ export default function Inventory() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#1C100A]">{getActivityLabel()}</p>
-                    <p className="text-xs text-[#9E8A7A] truncate">{activity.itemName}</p>
+                    <p className="text-xs text-[#9E8A7A] truncate font-medium">{activity.itemName}</p>
+                    <p className="text-xs text-[#6B5744] mt-1 truncate">{buildActivityDescription(activity)}</p>
                   </div>
                   <div className="text-xs text-[#C4B8B0] whitespace-nowrap">
                     {formatTime(activity.timestamp)}
@@ -740,6 +1040,28 @@ export default function Inventory() {
               );
             })}
           </div>
+          {recentTotalPages > 1 && (
+            <div className="px-4 sm:px-6 py-3 flex items-center justify-between border-t border-[#F0EDE8] bg-[#FBFAF8]">
+              <div className="text-xs text-[#9E8A7A]">Page {recentPage} of {recentTotalPages}</div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setRecentPage((page) => Math.max(1, page - 1))}
+                  disabled={recentPage === 1}
+                  className="px-3 py-1.5 border border-[#E2DDD8] rounded-lg text-sm text-[#6B5744] font-medium hover:bg-[#FAF6F2] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setRecentPage((page) => Math.min(recentTotalPages, page + 1))}
+                  disabled={recentPage === recentTotalPages}
+                  className="px-3 py-1.5 border border-[#E2DDD8] rounded-lg text-sm text-[#6B5744] font-medium hover:bg-[#FAF6F2] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </>
         ) : (
           <div className="px-4 sm:px-6 py-8 sm:py-10 text-center">
             <Coffee className="w-8 h-8 text-[#C4B8B0] mx-auto mb-3 opacity-50" />
