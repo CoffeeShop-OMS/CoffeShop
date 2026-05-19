@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Filter, Search, Coffee, Archive, Package, AlertTriangle, TrendingDown, RefreshCcw, PlusCircle, Edit2, Trash2, DollarSign, TrendingUp, ScrollText, Clock3, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { getAuthSession } from '../utils/authStorage';
-import { adjustInventoryStock, createInventoryItem, updateInventoryItem, deleteInventoryItem, restoreInventoryItem, getInventory, getInventoryLogs, getNotifications, getConversionRules } from '../services/api';
+import { adjustInventoryStock, createInventoryItem, updateInventoryItem, deleteInventoryItem, restoreInventoryItem, getInventory, getInventoryLogs, getNotifications } from '../services/api';
 import Dropdown from '../components/Dropdown';
 import InventoryHeader from '../components/inventory/InventoryHeader';
 import InventoryAlertBanner from '../components/inventory/InventoryAlertBanner';
@@ -237,6 +237,7 @@ export default function Inventory() {
   const [stockAdjustQuantity, setStockAdjustQuantity] = useState('1');
   const [stockAdjustExpirationDate, setStockAdjustExpirationDate] = useState('');
   const [stockAdjustBatchCost, setStockAdjustBatchCost] = useState('');
+  const [stockDeductionMode, setStockDeductionMode] = useState('manual');
   const [isSubmittingStockAdjust, setIsSubmittingStockAdjust] = useState(false);
   const [currentPage,     setCurrentPage]     = useState(1);
   const [selectedItems,   setSelectedItems]   = useState(new Set());
@@ -444,10 +445,13 @@ export default function Inventory() {
       itemName: data.name || fallbackItem?.name || 'Unknown item',
       timestamp: event?.timestamp || event?.receivedAt || new Date(),
       adjustment: data.adjustment,
+      previousQuantity: data.previousQuantity,
       newQuantity: data.quantity ?? fallbackItem?.quantity ?? 0,
       unit: data.unit || fallbackItem?.unit || '',
       reason: data.reason || '',
       expirationDate: data.expirationDate || null,
+      addedBatch: data.addedBatch || null,
+      consumedBatches: data.consumedBatches || [],
       performedBy: data.updatedBy || '',
       source: 'realtime',
     });
@@ -722,7 +726,18 @@ export default function Inventory() {
             ? 'consumption'
             : 'expired expiration alert',
         entry.consumedBatches
-          .map((batch) => [batch.expirationDate, batch.receivedAt, batch.quantity].filter(Boolean).join(' '))
+          .map((batch) =>
+            [
+              batch.id,
+              batch.expirationDate,
+              batch.receivedAt,
+              batch.quantity,
+              batch.previousQuantity,
+              batch.remainingQuantity,
+            ]
+              .filter(Boolean)
+              .join(' ')
+          )
           .join(' '),
         entry.addedBatch
           ? [entry.addedBatch.expirationDate, entry.addedBatch.receivedAt, entry.addedBatch.quantity]
@@ -994,6 +1009,7 @@ export default function Inventory() {
     setStockAdjustQuantity('1');
     setStockAdjustExpirationDate('');
     setStockAdjustBatchCost('');
+    setStockDeductionMode('manual');
   };
 
   const closeDrawer = () => {
@@ -1208,6 +1224,7 @@ export default function Inventory() {
     setStockAdjustQuantity('1');
     setStockAdjustExpirationDate('');
     setStockAdjustBatchCost(currentBatchCost);
+    setStockDeductionMode('manual');
   };
 
   const submitQuickStockAdjust = async () => {
@@ -1220,8 +1237,14 @@ export default function Inventory() {
     }
 
     const { item, direction } = stockAdjustDraft;
-    const quantity = normalizeInventoryQuantity(stockAdjustQuantity);
-    if (!stockAdjustQuantity || Number.isNaN(quantity)) {
+    const isAutoExpiredDeduct = direction < 0 && stockDeductionMode === 'expired';
+    const quantitySource = isAutoExpiredDeduct ? item.expiredQuantity : stockAdjustQuantity;
+    const quantity = normalizeInventoryQuantity(quantitySource);
+    if (isAutoExpiredDeduct && Number(item.expiredQuantity || 0) <= 0) {
+      toast.error(`No expired stock to deduct from ${item.name}.`);
+      return;
+    }
+    if (!quantitySource || Number.isNaN(quantity)) {
       toast.error('Please enter a valid quantity.');
       return;
     }
@@ -1243,6 +1266,8 @@ export default function Inventory() {
     const reason =
       signedAdjustment > 0
         ? `Quick stock increase from inventory list (${formatInventoryQuantity(quantity)} ${item.unit || 'unit'})`
+        : isAutoExpiredDeduct
+          ? `Auto deducted expired stock from inventory list (${formatInventoryQuantity(quantity)} ${item.unit || 'unit'})`
         : `Quick stock decrease from inventory list (${formatInventoryQuantity(quantity)} ${item.unit || 'unit'})`;
 
     try {
@@ -1294,12 +1319,13 @@ export default function Inventory() {
             expirationDate: (result?.data?.expirationDate ?? stockAdjustExpirationDate) || null,
             addedBatch:
               signedAdjustment > 0
-                ? {
+                ? result?.data?.addedBatch || {
                     quantity,
                     expirationDate: stockAdjustExpirationDate || null,
                     receivedAt: new Date().toISOString(),
                   }
                 : null,
+            consumedBatches: result?.data?.consumedBatches || [],
             performedBy: session.email || '',
             source: 'local',
           }),
@@ -1320,6 +1346,8 @@ export default function Inventory() {
       setStockAdjustDraft(null);
       setStockAdjustQuantity('1');
       setStockAdjustExpirationDate('');
+      setStockAdjustBatchCost('');
+      setStockDeductionMode('manual');
     } catch (error) {
       toast.error(extractApiErrorMessage(error, 'Failed to adjust stock.'));
     } finally {
@@ -2003,10 +2031,12 @@ export default function Inventory() {
         quantity={stockAdjustQuantity}
         expirationDate={stockAdjustExpirationDate}
         batchCost={stockAdjustBatchCost}
+        deductionMode={stockDeductionMode}
         isBusy={isSubmittingStockAdjust}
         onQuantityChange={setStockAdjustQuantity}
         onExpirationDateChange={setStockAdjustExpirationDate}
         onBatchCostChange={setStockAdjustBatchCost}
+        onDeductionModeChange={setStockDeductionMode}
         onCancel={closeStockAdjustModal}
         onConfirm={submitQuickStockAdjust}
       />

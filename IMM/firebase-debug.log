@@ -1,0 +1,135 @@
+[debug] [2026-05-19T13:55:19.516Z] ----------------------------------------------------------------------
+[debug] [2026-05-19T13:55:19.518Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ADMIN\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js hosting:disable --project production --site imm-coffeeandtea --force
+[debug] [2026-05-19T13:55:19.518Z] CLI Version:   15.11.0
+[debug] [2026-05-19T13:55:19.518Z] Platform:      win32
+[debug] [2026-05-19T13:55:19.518Z] Node Version:  v22.19.0
+[debug] [2026-05-19T13:55:19.519Z] Time:          Tue May 19 2026 21:55:19 GMT+0800 (Singapore Standard Time)
+[debug] [2026-05-19T13:55:19.519Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-19T13:55:19.696Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-19T13:55:19.697Z] > authorizing via signed-in user (marksilla12@gmail.com)
+[debug] [2026-05-19T13:55:19.697Z] [iam] checking project coffeeteaconnection for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-05-19T13:55:19.698Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:19.698Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:19.699Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions [none]
+[debug] [2026-05-19T13:55:19.699Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions  x-goog-user-project=coffeeteaconnection
+[debug] [2026-05-19T13:55:19.700Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-05-19T13:55:20.653Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions 200
+[debug] [2026-05-19T13:55:20.653Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-05-19T13:55:20.654Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:20.654Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:20.654Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/sites/imm-coffeeandtea/releases [none]
+[debug] [2026-05-19T13:55:20.654Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/sites/imm-coffeeandtea/releases {"type":"SITE_DISABLE"}
+[debug] [2026-05-19T13:55:21.455Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/sites/imm-coffeeandtea/releases 200
+[debug] [2026-05-19T13:55:21.455Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/sites/imm-coffeeandtea/releases {"name":"sites/imm-coffeeandtea/releases/1779198883760000","type":"SITE_DISABLE","releaseTime":"2026-05-19T13:54:43.760Z","releaseUser":{"email":"marksilla12@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocJRuy6LrVn8G7IbcdI4zt-vhG9IRDFq9asarGA-5XuVS_MKzBM=mo"}}
+[info] +  Hosting has been disabled for imm-coffeeandtea. Deploy a new version to re-enable. 
+[debug] [2026-05-19T13:55:22.109Z] ----------------------------------------------------------------------
+[debug] [2026-05-19T13:55:22.111Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\ADMIN\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only hosting:imm --project production
+[debug] [2026-05-19T13:55:22.111Z] CLI Version:   15.11.0
+[debug] [2026-05-19T13:55:22.111Z] Platform:      win32
+[debug] [2026-05-19T13:55:22.111Z] Node Version:  v22.19.0
+[debug] [2026-05-19T13:55:22.111Z] Time:          Tue May 19 2026 21:55:22 GMT+0800 (Singapore Standard Time)
+[debug] [2026-05-19T13:55:22.112Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-19T13:55:23.185Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-19T13:55:23.186Z] > authorizing via signed-in user (marksilla12@gmail.com)
+[debug] [2026-05-19T13:55:23.186Z] [iam] checking project coffeeteaconnection for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-05-19T13:55:23.187Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:23.187Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:23.188Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions [none]
+[debug] [2026-05-19T13:55:23.188Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions  x-goog-user-project=coffeeteaconnection
+[debug] [2026-05-19T13:55:23.188Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-05-19T13:55:24.144Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions 200
+[debug] [2026-05-19T13:55:24.144Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/coffeeteaconnection:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-05-19T13:55:24.145Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:24.145Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:24.145Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/coffeeteaconnection [none]
+[debug] [2026-05-19T13:55:24.673Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/coffeeteaconnection 200
+[debug] [2026-05-19T13:55:24.673Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/coffeeteaconnection {"projectId":"coffeeteaconnection","projectNumber":"444013177678","displayName":"Coffeeteaconnection","name":"projects/coffeeteaconnection","resources":{"hostingSite":"coffeeteaconnection"},"state":"ACTIVE","etag":"1_3ff73199-854c-49b6-a990-68e0c88bac04"}
+[info] 
+[info] === Deploying to 'coffeeteaconnection'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2026-05-19T13:55:24.678Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:24.678Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:24.678Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions [none]
+[debug] [2026-05-19T13:55:24.678Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2026-05-19T13:55:25.853Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions 200
+[debug] [2026-05-19T13:55:25.853Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions {"name":"projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[imm-coffeeandtea]: beginning deploy... 
+[info] i  hosting[imm-coffeeandtea]: found 7 files in InventoryFrontend/dist 
+[debug] [2026-05-19T13:55:25.864Z] [hosting] uploading with 200 concurrency
+[debug] [2026-05-19T13:55:25.903Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:25.903Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:25.904Z] [hosting] hash cache [SW52ZW50b3J5RnJvbnRlbmRcZGlzdA] stored for 7 files
+[debug] [2026-05-19T13:55:25.905Z] [hosting][hash queue][FINAL] {"max":36,"min":2,"avg":10,"active":0,"complete":7,"success":7,"errored":0,"retried":0,"total":7,"elapsed":40}
+[debug] [2026-05-19T13:55:25.905Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e:populateFiles [none]
+[debug] [2026-05-19T13:55:25.905Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e:populateFiles {"files":{"/Logo.png":"111044eeddfcaf8c7dab422fc671918b4f379ac9cd82880990e4e55d4556fe98","/index.html":"5c64bcacc55b0414cd2134cde616c44d4ea9c769234eed820e00aaafe7257c06","/assets/purify.es-OpeaODd9.js":"ceb06c0c9311fa3065908da1fcfdae23268b3a35e536fda07956e3e0b82c725c","/assets/index-gfkYZFa3.css":"71277428a2d23696eec32ebe7e256952a2a85d942e5a9c5fc092e68424b19e5f","/assets/index.es-DbTcte1j.js":"a220aaa7518882b79b5338775b8bb1ec973fb03f702a725d9daed09c1c8e29db","/assets/html2canvas.esm-DXEQVQnt.js":"01db109999aa1d6836594d5d82b9ed78d6239313854ccf0e48557ddc0a6ab1f1","/assets/index-CxsawE3O.js":"71e61ae457e99be3d92277d93dc82ad5c846930287f0f414417b74aafcfebf91"}}
+[debug] [2026-05-19T13:55:26.543Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e:populateFiles 200
+[debug] [2026-05-19T13:55:26.543Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e:populateFiles {"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/imm-coffeeandtea/versions/d0a33d000761a68e/files"}
+[debug] [2026-05-19T13:55:26.543Z] [hosting][populate queue][FINAL] {"max":640,"min":640,"avg":640,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":640}
+[debug] [2026-05-19T13:55:26.543Z] [hosting] uploads queued: 0
+[debug] [2026-05-19T13:55:26.543Z] [hosting][upload queue][FINAL] {"max":0,"min":9999999999,"avg":0,"active":0,"complete":0,"success":0,"errored":0,"retried":0,"total":0,"elapsed":1779198926543}
+[info] i  hosting: upload complete 
+[info] +  hosting[imm-coffeeandtea]: file upload complete 
+[debug] [2026-05-19T13:55:26.544Z] [hosting] deploy completed after 689ms
+[debug] [2026-05-19T13:55:26.544Z] [
+  {
+    "config": {
+      "target": "imm",
+      "public": "InventoryFrontend/dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/api/**",
+          "function": {
+            "functionId": "api"
+          }
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "imm-coffeeandtea"
+    },
+    "version": "projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e"
+  }
+]
+[info] i  hosting[imm-coffeeandtea]: finalizing version... 
+[debug] [2026-05-19T13:55:26.545Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:26.546Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:26.546Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/coffeeteaconnection/locations/-/functions [none]
+[debug] [2026-05-19T13:55:27.315Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/coffeeteaconnection/locations/-/functions 200
+[debug] [2026-05-19T13:55:27.315Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/coffeeteaconnection/locations/-/functions {}
+[debug] [2026-05-19T13:55:27.316Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:27.316Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:27.316Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/coffeeteaconnection/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2026-05-19T13:55:28.847Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/coffeeteaconnection/locations/-/functions 200
+[debug] [2026-05-19T13:55:28.847Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/coffeeteaconnection/locations/-/functions {"functions":[{"name":"projects/coffeeteaconnection/locations/us-central1/functions/api","buildConfig":{"build":"projects/444013177678/locations/us-central1/builds/d8d46860-479c-4928-a742-3d9ce0324ce5","runtime":"nodejs20","entryPoint":"api","source":{"storageSource":{"bucket":"gcf-v2-sources-444013177678-us-central1","object":"api/function-source.zip","generation":"1779197932088911"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/coffeeteaconnection/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-444013177678-us-central1","object":"api/function-source.zip","generation":"1779197932088911"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/coffeeteaconnection/serviceAccounts/444013177678-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/coffeeteaconnection/locations/us-central1/services/api","timeoutSeconds":60,"environmentVariables":{"NODE_ENV":"development","RATE_LIMIT_MAX":"500","RATE_LIMIT_WINDOW_MIN":"15","APP_PORT":"4000","ALLOWED_ORIGINS":"http://localhost:5173,https://coffeeteaconnection--dev-mark-6nyrxwvl.web.app","ADMIN_EMAIL":"coffeeandtea@gmail.com","ADMIN_PASSWORD":"coffeeandtea123","ADMIN_SESSION_SECRET":"secretkeytoyah","ADMIN_SESSION_TTL_MINUTES":"480","ADMINSDK_PROJECT_ID":"coffeeteaconnection","ADMINSDK_CLIENT_EMAIL":"firebase-adminsdk-fbsvc@coffeeteaconnection.iam.gserviceaccount.com","ADMINSDK_PRIVATE_KEY":"-----BEGIN PRIVATE KEY-----\\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDAQ9YFK1vcCEbK\\n6bMJ8G4U4VcYsHuY8krkUOnDrBZEZ3253E4iMc8EGzvGzXKalodRtR7bxayImsp2\\nnb0LWZZ0KbLiwwTTNh+8D1VLLw1H55OLNpOVS0SR4acZrdLH/UpuwNufotlxh9xY\\n9Dg0HZ7SKqM9BUwNvw1H0U5Mixk1r4/77fR5lzgseN8zUpmwGKW5OKjkdkBf62Dx\\ntJJUHRQlrQEw7FxW9mIdHiKVJYsROxqIBhn/kPorImSeyhZXOdXbNkzwKeSwLgSa\\n9cl0zT1XOnhzpU8BEEGPHFCV4nEJaC/rqB530AXoE/WYlBbRoVxll8B8XQlzWReG\\n5Tps69QlAgMBAAECggEAGLtBIatuUV3r2U3O1Cr4xg0nJSENLQ3nDfp4hM0zP2ZT\\n7l9ahPHaRWweuC0U87IEQxbkxXQRLwXroEQccq7PTdmlTfUJvwTZzS49vwI/l5hq\\nysALo5XUgrK/n2vUJBnpWVjL3NDXs/pmy4x9WaWBGLDCYbw3iGx4erH/ppSdUAyF\\naXrLxSdoJmmyWhXa2LcHX1TU38aBPxnHnQRvcBGyf6t+J3tR4SQDqvYKHVzZ31Ju\\nIyLu5LusRV3yJ59J6FqExfj8NoVDcU5YK7KaybO0Gm01gcxwJYL+i4U+aCC3RbFl\\n4E5RkwydDp/pD18eoy64c2d9q7T1z4zYlyNSfA3ciwKBgQD1gwE0LMIReZk9qUYF\\n19lPt0VSyNsvSZEKnsl+9NICMqgxroIkF2thDAZubd0xg2K6NmtO14VqFpF3e+7s\\npc7FgGODAjRzv7YD2S89TQ9GC6inMzj75tQsQ+EFEVf80nqSnGRpt69wcyNQ4/R1\\neHtsNkGUbAkKMeOpB7+UyHi7GwKBgQDIeoH5BbuT703Cbvh2G60lW9DdCS/KA9Ad\\nXH9j3sz9IGSCAM8MQe9iK+aFl+431MiltfDK2k7v7tfzBnrP5e4nqri6aBx7+xF7\\n9c5tnek0X+5wbQJCSm2ZoiYV9Do40wPgZk1Z692M2cE8E8DWId/L1Oext/2/s7ht\\naLQOGAlhvwKBgBx6b79PmctRIZdndTnkSc7XYXEy30ni7LIgrRrO5zVeDuiEZ5As\\nL0Z4kJ5qnAfMR7115oiks1MU/xavB43nxc5fECv4K4FpsYFMxhAESktDuvJ6HJgL\\ntHzV+toNovkuqQ0smvEwX2dZ07TkXEzsBtUMjhrbVUkbdF79CRoHDwoVAoGAEr4Z\\nTp2xlrgFrgrP4cLeoiJ+WVvVgu5uU4BlTIH06ilQHDNVKBE1/xiZmZ3FoKSdCZkD\\n5QMZ5CaRO+A8NRmK9VxpnsvC9fhX/x3Q6cCcn8/kK9CVKHtq2bUmGGFX3B4mO6F0\\n09ZQRS3KegJiweIy2QyTiLLp3zU/JcNnKfYnUmMCgYB0PdcfCqSga4jIRH4QBZgL\\nGrD8tifoAt+rd3y6qq3HYvKQasX++dSIecPI3Q4B6LmdsBmChlmNqx1xwuhA7o6Z\\ntEnrTFUlQDi3L18ffahpomNfPzIbZ5sOgWBu2fxd/PnTo7zY9o+N8XKlVy+9o88c\\nQeVVCzE77NEltEqX8qr/ew==\\n-----END PRIVATE KEY-----\\n","FIREBASE_CONFIG":"{\"projectId\":\"coffeeteaconnection\",\"storageBucket\":\"coffeeteaconnection.firebasestorage.app\"}","GCLOUD_PROJECT":"coffeeteaconnection","EVENTARC_CLOUD_EVENT_SOURCE":"projects/coffeeteaconnection/locations/us-central1/services/api","FUNCTION_TARGET":"api","LOG_EXECUTION_ID":"true"},"maxInstanceCount":20,"ingressSettings":"ALLOW_ALL","uri":"https://api-dykutj5x2q-uc.a.run.app","serviceAccountEmail":"444013177678-compute@developer.gserviceaccount.com","availableMemory":"256Mi","allTrafficOnLatestRevision":true,"revision":"api-00006-dar","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"state":"ACTIVE","updateTime":"2026-05-19T13:40:00.618657257Z","labels":{"firebase-functions-hash":"4bf675b6f2368b464ae9d5f6cea567c409afbd18","deployment-tool":"cli-firebase"},"environment":"GEN_2","url":"https://us-central1-coffeeteaconnection.cloudfunctions.net/api","createTime":"2026-03-20T16:02:48.040361214Z","satisfiesPzi":true}]}
+[debug] [2026-05-19T13:55:28.849Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:28.849Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:28.849Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions/d0a33d000761a68e updateMask=status%2Cconfig
+[debug] [2026-05-19T13:55:28.849Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions/d0a33d000761a68e {"status":"FINALIZED","config":{"rewrites":[{"glob":"/api/**","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]}}
+[debug] [2026-05-19T13:55:29.705Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions/d0a33d000761a68e 200
+[debug] [2026-05-19T13:55:29.705Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/versions/d0a33d000761a68e {"name":"projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e","status":"FINALIZED","config":{"rewrites":[{"glob":"/api/**","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-05-19T13:54:48.330938Z","createUser":{"email":"marksilla12@gmail.com"},"finalizeTime":"2026-05-19T13:54:52.656855Z","finalizeUser":{"email":"marksilla12@gmail.com"}}
+[debug] [2026-05-19T13:55:29.705Z] [hosting] finalized version for imm-coffeeandtea:[object Object]
+[info] +  hosting[imm-coffeeandtea]: version finalized 
+[info] i  hosting[imm-coffeeandtea]: releasing new version... 
+[debug] [2026-05-19T13:55:29.705Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:29.705Z] Checked if tokens are valid: true, expires at: 1779200371701
+[debug] [2026-05-19T13:55:29.706Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/channels/live/releases versionName=projects%2F444013177678%2Fsites%2Fimm-coffeeandtea%2Fversions%2Fd0a33d000761a68e
+[debug] [2026-05-19T13:55:29.706Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/channels/live/releases {}
+[debug] [2026-05-19T13:55:30.412Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/channels/live/releases 200
+[debug] [2026-05-19T13:55:30.412Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/imm-coffeeandtea/channels/live/releases {"name":"projects/444013177678/sites/imm-coffeeandtea/channels/live/releases/1779198892653000","version":{"name":"projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e","status":"FINALIZED","config":{"rewrites":[{"glob":"/api/**","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-05-19T13:54:48.330938Z","createUser":{"email":"marksilla12@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocJRuy6LrVn8G7IbcdI4zt-vhG9IRDFq9asarGA-5XuVS_MKzBM=mo"},"finalizeTime":"2026-05-19T13:54:52.656855Z","finalizeUser":{"email":"marksilla12@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocJRuy6LrVn8G7IbcdI4zt-vhG9IRDFq9asarGA-5XuVS_MKzBM=mo"}},"type":"DEPLOY","releaseTime":"2026-05-19T13:54:52.653Z","releaseUser":{"email":"marksilla12@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocJRuy6LrVn8G7IbcdI4zt-vhG9IRDFq9asarGA-5XuVS_MKzBM=mo"}}
+[debug] [2026-05-19T13:55:30.412Z] [hosting] release: {"name":"projects/444013177678/sites/imm-coffeeandtea/channels/live/releases/1779198892653000","version":{"name":"projects/444013177678/sites/imm-coffeeandtea/versions/d0a33d000761a68e","status":"FINALIZED","config":{"rewrites":[{"glob":"/api/**","run":{"serviceId":"api","region":"us-central1"}},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-05-19T13:54:48.330938Z","createUser":{"email":"marksilla12@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocJRuy6LrVn8G7IbcdI4zt-vhG9IRDFq9asarGA-5XuVS_MKzBM=mo"},"finalizeTime":"2026-05-19T13:54:52.656855Z","finalizeUser":{"email":"marksilla12@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocJRuy6LrVn8G7IbcdI4zt-vhG9IRDFq9asarGA-5XuVS_MKzBM=mo"}},"type":"DEPLOY","releaseTime":"2026-05-19T13:54:52.653Z","releaseUser":{"email":"marksilla12@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocJRuy6LrVn8G7IbcdI4zt-vhG9IRDFq9asarGA-5XuVS_MKzBM=mo"}}
+[info] +  hosting[imm-coffeeandtea]: release complete 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/coffeeteaconnection/overview
+[info] Hosting URL: https://imm-coffeeandtea.web.app

@@ -8,82 +8,120 @@ import {
 
 import StatCards from '../components/inventory/StatCards';
 import DailyUsageGraph from '../components/dashboard/DailyUsageGraph';
+import CriticalStockGraph from '../components/dashboard/CriticalStockGraph';
 import { getInventory, getInventoryLogs } from '../services/api';
 import { getAuthSession } from '../utils/authStorage';
+import { parseTimestamp } from '../utils/inventoryRealtime';
 import { toast } from 'sonner';
 
 const dashboardCache = {
   stats: null,
-  inventoryItems: null,
   categoryDistribution: null,
   allAlerts: null,
   alertItems: null,
   lastSync: null,
   logs: null,
+  usageLogs: null,
   statsTs: 0,
   logsTs: 0,
+  usageLogsTs: 0,
 };
 
 const DASHBOARD_CACHE_TTL = 15 * 1000; // 15 seconds
+const USAGE_HISTORY_DAYS = 365 * 5 + 7;
+const USAGE_LOG_PAGE_LIMIT = 100;
+const USAGE_LOG_MAX_PAGES = 12;
 
-export default function Dashboard({ setIsAuthenticated }) {
+const fetchStockAdjustmentLogs = async (token) => {
+  const collectedLogs = [];
+  let cursor = null;
+
+  for (let pageIndex = 0; pageIndex < USAGE_LOG_MAX_PAGES; pageIndex += 1) {
+    const response = await getInventoryLogs(token, {
+      action: 'STOCK_ADJUST',
+      days: USAGE_HISTORY_DAYS,
+      limit: USAGE_LOG_PAGE_LIMIT,
+      cursor,
+    });
+    const logs = Array.isArray(response?.data) ? response.data : [];
+
+    collectedLogs.push(...logs);
+
+    if (!response?.nextCursor || logs.length === 0) {
+      break;
+    }
+
+    cursor = response.nextCursor;
+  }
+
+  return collectedLogs;
+};
+
+const isLogWithinLastDays = (log, days) => {
+  const timestamp = parseTimestamp(log?.timestamp || log?.createdAt);
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  return timestamp >= cutoff;
+};
+
+const normalizeCategory = (value) => {
+  const raw = String(value || '').trim().toLowerCase().replace(/[-_\s]+/g, '');
+  const map = {
+    beans: 'Beans',
+    milk: 'Milk',
+    dairy: 'Milk',
+    syrup: 'Syrup',
+    syrups: 'Syrup',
+    packaging: 'Cups',
+    cup: 'Cups',
+    cups: 'Cups',
+    paper: 'Cups',
+    papers: 'Cups',
+    pastry: 'Pastries',
+    pastries: 'Pastries',
+    equipment: 'Equipment',
+    addins: 'Add-ins',
+    powder: 'Powder',
+    other: 'Other',
+  };
+  return map[raw] || 'Other';
+};
+
+const buildCategoryDistribution = (items) => {
+  const totals = items.reduce((acc, item) => {
+    const category = normalizeCategory(item.category);
+    const qty = Number(item.quantity || 0);
+    acc[category] = (acc[category] || 0) + qty;
+    return acc;
+  }, {});
+
+  const grandTotal = Object.values(totals).reduce((sum, value) => sum + value, 0);
+  if (!grandTotal) return [];
+
+  return Object.entries(totals)
+    .map(([category, qty]) => {
+      const rawPercent = (qty / grandTotal) * 100;
+      return {
+        category,
+        qty,
+        percent: Number(rawPercent.toFixed(1)),
+        displayPercent: rawPercent > 0 && rawPercent < 0.5 ? 0.5 : Number(rawPercent.toFixed(1)),
+      };
+    })
+    .sort((a, b) => b.qty - a.qty);
+};
+
+export default function Dashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ total: 0, lowCount: 0, outCount: 0, archivedCount: 0, value: 0 });
-  const [inventoryItems, setInventoryItems] = useState([]);
   const [categoryDistribution, setCategoryDistribution] = useState([]);
   const [alertItems, setAlertItems] = useState([]);
   const [allAlerts, setAllAlerts] = useState([]);
   const [showAllAlerts, setShowAllAlerts] = useState(false);
   const [lastSync, setLastSync] = useState(null);
   const [logs, setLogs] = useState([]);
-  const [isLoadingLogs, setIsLoadingLogs] = useState(true);
-
-  const normalizeCategory = (value) => {
-    const raw = String(value || '').trim().toLowerCase().replace(/[-_\s]+/g, '');
-    const map = {
-      beans: 'Beans',
-      milk: 'Milk',
-      dairy: 'Milk',
-      syrup: 'Syrup',
-      syrups: 'Syrup',
-      packaging: 'Cups',
-      cup: 'Cups',
-      cups: 'Cups',
-      paper: 'Cups',
-      papers: 'Cups',
-      pastry: 'Pastries',
-      pastries: 'Pastries',
-      equipment: 'Equipment',
-      addins: 'Add-ins',
-      powder: 'Powder',
-      other: 'Other',
-    };
-    return map[raw] || 'Other';
-  };
-
-  const buildCategoryDistribution = (items) => {
-    const totals = items.reduce((acc, item) => {
-      const category = normalizeCategory(item.category);
-      const qty = Number(item.quantity || 0);
-      acc[category] = (acc[category] || 0) + qty;
-      return acc;
-    }, {});
-
-    const grandTotal = Object.values(totals).reduce((sum, value) => sum + value, 0);
-    if (!grandTotal) return [];
-
-    return Object.entries(totals)
-      .map(([category, qty]) => {
-        const rawPercent = (qty / grandTotal) * 100;
-        return {
-          category,
-          qty,
-          percent: Number(rawPercent.toFixed(1)),
-          displayPercent: rawPercent > 0 && rawPercent < 0.5 ? 0.5 : Number(rawPercent.toFixed(1)),
-        };
-      })
-      .sort((a, b) => b.qty - a.qty);
-  };
+  const [usageLogs, setUsageLogs] = useState([]);
+  const [isLoadingUsageLogs, setIsLoadingUsageLogs] = useState(true);
 
   const formatLogTimestamp = (timestamp) => {
     if (!timestamp) return 'Unknown time';
@@ -170,14 +208,12 @@ export default function Dashboard({ setIsAuthenticated }) {
           const nextLastSync = new Date();
 
           setStats(nextStats);
-          setInventoryItems(items);
           setCategoryDistribution(nextCategoryDistribution);
           setAllAlerts(sortedAlerts); // Store all alerts
           setAlertItems(nextAlertItems); // Display only top 4
           setLastSync(nextLastSync);
 
           dashboardCache.stats = nextStats;
-          dashboardCache.inventoryItems = items;
           dashboardCache.categoryDistribution = nextCategoryDistribution;
           dashboardCache.allAlerts = sortedAlerts;
           dashboardCache.alertItems = nextAlertItems;
@@ -192,7 +228,6 @@ export default function Dashboard({ setIsAuthenticated }) {
     const now = Date.now();
     if (dashboardCache.stats && now - dashboardCache.statsTs < DASHBOARD_CACHE_TTL) {
       setStats(dashboardCache.stats);
-      setInventoryItems(dashboardCache.inventoryItems || []);
       setCategoryDistribution(dashboardCache.categoryDistribution || []);
       setAllAlerts(dashboardCache.allAlerts || []);
       setAlertItems(dashboardCache.alertItems || []);
@@ -208,19 +243,16 @@ export default function Dashboard({ setIsAuthenticated }) {
   useEffect(() => {
     let mounted = true;
     const loadLogs = async () => {
-      setIsLoadingLogs(true);
       const now = Date.now();
       if (dashboardCache.logs && now - dashboardCache.logsTs < DASHBOARD_CACHE_TTL) {
         if (mounted) {
           setLogs(dashboardCache.logs || []);
-          setIsLoadingLogs(false);
         }
         return;
       }
 
       const session = getAuthSession();
       if (!session?.token) {
-        setIsLoadingLogs(false);
         return;
       }
       try {
@@ -234,13 +266,49 @@ export default function Dashboard({ setIsAuthenticated }) {
       } catch (err) {
         console.error('Failed to load usage logs:', err);
         // Silently fail for logs - don't show toast
-      } finally {
-        if (mounted) setIsLoadingLogs(false);
       }
     };
 
     loadLogs();
     const interval = setInterval(loadLogs, 60 * 1000); // refresh every minute
+    return () => { mounted = false; clearInterval(interval); };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadUsageLogs = async () => {
+      setIsLoadingUsageLogs(true);
+      const now = Date.now();
+      if (dashboardCache.usageLogs && now - dashboardCache.usageLogsTs < DASHBOARD_CACHE_TTL) {
+        if (mounted) {
+          setUsageLogs(dashboardCache.usageLogs || []);
+          setIsLoadingUsageLogs(false);
+        }
+        return;
+      }
+
+      const session = getAuthSession();
+      if (!session?.token) {
+        setIsLoadingUsageLogs(false);
+        return;
+      }
+
+      try {
+        const newUsageLogs = await fetchStockAdjustmentLogs(session.token);
+        if (mounted) {
+          setUsageLogs(newUsageLogs);
+          dashboardCache.usageLogs = newUsageLogs;
+          dashboardCache.usageLogsTs = Date.now();
+        }
+      } catch (err) {
+        console.error('Failed to load stock usage logs:', err);
+      } finally {
+        if (mounted) setIsLoadingUsageLogs(false);
+      }
+    };
+
+    loadUsageLogs();
+    const interval = setInterval(loadUsageLogs, 60 * 1000); // refresh every minute
     return () => { mounted = false; clearInterval(interval); };
   }, []);
 
@@ -272,57 +340,107 @@ export default function Dashboard({ setIsAuthenticated }) {
     return 'text-amber-600';
   };
 
+  const criticalAlerts = allAlerts.filter((item) => item.severity === 'critical');
+  const warningAlerts = allAlerts.filter((item) => item.severity !== 'critical');
+
   const recentLogs = logs.slice(0, 4);
-  const positiveAdjustments = logs.filter((log) => Number(log.details?.adjustment || 0) > 0).length;
-  const negativeAdjustments = logs.filter((log) => Number(log.details?.adjustment || 0) < 0).length;
-  const netAdjustment = logs.reduce((sum, log) => sum + Number(log.details?.adjustment || 0), 0);
+  const recentStockLogs = usageLogs.filter((log) => isLogWithinLastDays(log, 7));
+  const positiveAdjustments = recentStockLogs.filter((log) => Number(log.details?.adjustment || 0) > 0).length;
+  const negativeAdjustments = recentStockLogs.filter((log) => Number(log.details?.adjustment || 0) < 0).length;
+  const netAdjustment = recentStockLogs.reduce((sum, log) => sum + Number(log.details?.adjustment || 0), 0);
 
   return (
     <div className="w-full p-8 bg-[#F7F4F0]">
       {/* All Alerts Modal */}
       {showAllAlerts && (
-        <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex justify-between items-start">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl border border-[#EAE5E0] shadow-xl max-w-3xl w-full max-h-[88vh] overflow-hidden">
+            <div className="bg-[#FDFCFB] border-b border-[#F0EDE8] px-5 sm:px-6 py-5 flex justify-between items-start gap-4">
               <div>
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5 text-gray-500" /> All Priority Alerts
+                <h2 className="text-lg font-bold text-[#1C100A] flex items-center gap-2">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-red-50">
+                    <AlertTriangle className="w-4 h-4 text-red-600" />
+                  </span>
+                  Priority Alerts
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">{allAlerts.length} item{allAlerts.length === 1 ? '' : 's'} need attention</p>
+                <p className="text-xs text-[#9E8A7A] mt-1">
+                  {allAlerts.length} item{allAlerts.length === 1 ? '' : 's'} need attention across active inventory.
+                </p>
               </div>
               <button
+                type="button"
                 onClick={() => setShowAllAlerts(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="rounded-full p-1.5 text-[#9E8A7A] hover:bg-[#F8F4EF] hover:text-[#2C1810] transition-colors"
+                aria-label="Close priority alerts"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 space-y-3">
+            <div className="border-b border-[#F0EDE8] bg-white px-5 sm:px-6 py-4 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-red-700 font-semibold">Critical</p>
+                <p className="mt-1 text-2xl font-bold text-red-700">{criticalAlerts.length}</p>
+              </div>
+              <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-amber-700 font-semibold">Low Stock</p>
+                <p className="mt-1 text-2xl font-bold text-amber-700">{warningAlerts.length}</p>
+              </div>
+            </div>
+
+            <div className="p-5 sm:p-6 space-y-3 overflow-y-auto max-h-[58vh]">
               {allAlerts.length === 0 ? (
-                <div className="p-8 text-center">
-                  <p className="text-lg text-gray-600 font-medium">✓ All inventory levels healthy</p>
-                  <p className="text-sm text-gray-400 mt-1">No items below threshold</p>
+                <div className="p-8 text-center rounded-2xl bg-[#FAF8F5] border border-[#EEE5DB]">
+                  <p className="text-sm font-semibold text-[#3D261D]">All inventory levels healthy</p>
+                  <p className="text-xs text-[#9E8A7A] mt-1">No items are below threshold right now.</p>
                 </div>
               ) : (
                 allAlerts.map((item) => (
-                  <div key={item.id} className="p-4 border border-gray-100 rounded-xl flex justify-between items-center hover:bg-gray-50 transition-colors">
-                    <div>
-                      <p className="font-bold text-gray-900">{item.name}</p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Current: {item.quantity}{item.unit} / Reorder: {item.lowStockThreshold}{item.unit}
-                      </p>
+                  <div key={item.id} className="p-4 border border-[#EEE5DB] rounded-2xl bg-[#FCFAF8] hover:bg-[#FAF6F2] transition-colors">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
+                        <p className="font-bold text-[#1C100A] truncate">{item.name}</p>
+                        <p className="text-xs text-[#9E8A7A] mt-1">{normalizeCategory(item.category)}</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 sm:min-w-[230px]">
+                        <div className="rounded-xl bg-white border border-[#F0EDE8] px-3 py-2">
+                          <p className="text-[10px] uppercase tracking-[0.16em] text-[#A89080] font-semibold">Current</p>
+                          <p className="text-sm font-bold text-[#1C100A]">{item.quantity}{item.unit}</p>
+                        </div>
+                        <div className="rounded-xl bg-white border border-[#F0EDE8] px-3 py-2">
+                          <p className="text-[10px] uppercase tracking-[0.16em] text-[#A89080] font-semibold">Reorder</p>
+                          <p className="text-sm font-bold text-[#1C100A]">{item.lowStockThreshold}{item.unit}</p>
+                        </div>
+                      </div>
+                      <span className={`inline-flex justify-center rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap ${
+                        item.severity === 'critical'
+                          ? 'bg-red-600 text-white'
+                          : 'bg-amber-100 text-amber-800 border border-amber-200'
+                      }`}>
+                        {item.severity === 'critical' ? 'Critical' : 'Low'}
+                      </span>
                     </div>
-                    <span className={`text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap ml-4 ${
-                      item.severity === 'critical'
-                        ? 'bg-red-500 text-white'
-                        : 'border border-gray-300 text-gray-600'
-                    }`}>
-                      {item.severity}
-                    </span>
+                    <div className="mt-3 h-2 rounded-full bg-white border border-[#F0EDE8] overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${item.severity === 'critical' ? 'bg-red-600' : 'bg-amber-500'}`}
+                        style={{
+                          width: `${Math.max(4, Math.min(100, (Number(item.quantity || 0) / Math.max(Number(item.lowStockThreshold || 1), 1)) * 100))}%`,
+                        }}
+                      />
+                    </div>
                   </div>
                 ))
               )}
+            </div>
+
+            <div className="border-t border-[#F0EDE8] bg-[#FDFCFB] px-5 sm:px-6 py-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowAllAlerts(false)}
+                className="rounded-xl bg-[#3D261D] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2E1C15] transition-colors"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -374,7 +492,7 @@ export default function Dashboard({ setIsAuthenticated }) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
             {/* Big Graph - Daily Ingredient Usage */}
-            <DailyUsageGraph logs={logs} isLoading={isLoadingLogs} />
+            <DailyUsageGraph logs={usageLogs} isLoading={isLoadingUsageLogs} />
 
             {/* Priority Alerts */}
             <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
@@ -386,8 +504,9 @@ export default function Dashboard({ setIsAuthenticated }) {
                   <p className="text-xs text-gray-500">Items below threshold as of today</p>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setShowAllAlerts(true)}
-                  className="text-xs text-gray-600 hover:text-gray-900"
+                  className="rounded-full border border-[#E2DDD8] bg-[#FAF8F5] px-3 py-1 text-xs font-semibold text-[#3D261D] hover:bg-[#F0E7DE] transition-colors"
                 >
                   View All
                 </button>
@@ -429,6 +548,8 @@ export default function Dashboard({ setIsAuthenticated }) {
               </div>
             </div>
           </div>
+
+          <CriticalStockGraph items={allAlerts} onViewAll={() => setShowAllAlerts(true)} />
 
           {/* Bottom Section - 3 Columns */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -478,7 +599,7 @@ export default function Dashboard({ setIsAuthenticated }) {
               <div className="grid grid-cols-1 gap-3">
                 <div className="rounded-2xl bg-[#F9FAF7] p-4">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2">Total Adjustments</p>
-                  <p className="text-3xl font-bold text-gray-900">{logs.length}</p>
+                  <p className="text-3xl font-bold text-gray-900">{recentStockLogs.length}</p>
                 </div>
                 <div className="rounded-2xl bg-[#F7F4F0] p-4">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2">Consumed</p>
@@ -536,7 +657,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                               actionText: 'Deleted',
                               description: 'Item archived'
                             };
-                          case 'STOCK_ADJUST':
+                          case 'STOCK_ADJUST': {
                             const adjustment = Number(log.details?.adjustment || 0);
                             const isRestock = adjustment > 0;
                             return {
@@ -546,6 +667,7 @@ export default function Dashboard({ setIsAuthenticated }) {
                               actionText: isRestock ? 'Restocked' : 'Consumed',
                               description: log.details?.reason || `${Math.abs(adjustment)} units ${isRestock ? 'added' : 'removed'}`
                             };
+                          }
                           default:
                             return {
                               icon: RefreshCw,

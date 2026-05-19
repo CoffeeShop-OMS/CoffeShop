@@ -81,12 +81,28 @@ const toClientErrorMessage = (error, fallbackMessage) => {
 };
 
 const mapBatchLogDetails = (batches = []) =>
-  batches.map((batch) => ({
-    id: batch.id,
-    quantity: batch.quantity,
-    expirationDate: batch.expirationDate || null,
-    receivedAt: batch.receivedAt || null,
-  }));
+  batches.map((batch) => {
+    const details = {
+      id: batch.id || "",
+      quantity: batch.quantity,
+      expirationDate: batch.expirationDate || null,
+      receivedAt: batch.receivedAt || null,
+    };
+
+    if (batch.previousQuantity !== undefined && batch.previousQuantity !== null) {
+      details.previousQuantity = batch.previousQuantity;
+    }
+
+    if (batch.remainingQuantity !== undefined && batch.remainingQuantity !== null) {
+      details.remainingQuantity = batch.remainingQuantity;
+    }
+
+    if (batch.isExpired !== undefined && batch.isExpired !== null) {
+      details.isExpired = Boolean(batch.isExpired);
+    }
+
+    return details;
+  });
 
 const normalizeQuantityValue = (value) => {
   const parsed = Number.parseFloat(value ?? 0);
@@ -533,23 +549,27 @@ const adjustStock = async (req, res) => {
       };
     });
 
+    const loggedAddedBatch = result.addedBatch
+      ? {
+          quantity: result.addedBatch.quantity,
+          expirationDate: result.addedBatch.expirationDate || null,
+          receivedAt: result.addedBatch.receivedAt || null,
+        }
+      : null;
+    const loggedConsumedBatches = mapBatchLogDetails(result.consumedBatches);
+    const previousQuantity = result.newQuantity - adjustmentValue;
+
     await logActivity("STOCK_ADJUST", req.params.id, result.itemName, req.user.uid, {
       adjustment: adjustmentValue,
       direction: adjustmentValue >= 0 ? "IN" : "OUT",
       reason,
       sku: result.item.sku || "",
       unit: result.item.unit || "",
-      previousQuantity: result.newQuantity - adjustmentValue,
+      previousQuantity,
       newQuantity: result.newQuantity,
       expirationDate: result.expirationDate || null,
-      addedBatch: result.addedBatch
-        ? {
-            quantity: result.addedBatch.quantity,
-            expirationDate: result.addedBatch.expirationDate || null,
-            receivedAt: result.addedBatch.receivedAt || null,
-          }
-        : null,
-      consumedBatches: mapBatchLogDetails(result.consumedBatches),
+      addedBatch: loggedAddedBatch,
+      consumedBatches: loggedConsumedBatches,
       fifoMode: "FIFO",
     });
 
@@ -569,7 +589,10 @@ const adjustStock = async (req, res) => {
       isLowStock: result.isLowStock,
       status: result.item.status || "active",
       adjustment: adjustmentValue,
+      previousQuantity,
       reason,
+      addedBatch: loggedAddedBatch,
+      consumedBatches: loggedConsumedBatches,
     });
 
     await syncNotificationsForItem({
@@ -586,9 +609,13 @@ const adjustStock = async (req, res) => {
       message: `Stock adjusted by ${adjustmentValue > 0 ? "+" : ""}${adjustmentValue}`,
       data: {
         newQuantity: result.newQuantity,
+        previousQuantity,
         isLowStock: result.isLowStock,
         expirationDate: result.expirationDate || null,
         stockBatches: result.stockBatches || [],
+        totalBatchCost: result.totalBatchCost,
+        addedBatch: loggedAddedBatch,
+        consumedBatches: loggedConsumedBatches,
         ...(result.isLowStock && { alert: "⚠️ Item is below low stock threshold!" }),
       },
     });

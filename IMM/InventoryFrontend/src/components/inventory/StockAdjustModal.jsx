@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowDown, ArrowUp, Package2 } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowUp, Edit2, Package2, Sparkles } from 'lucide-react';
 import { summarizeInventoryAfterAddition } from '../../utils/inventoryBatches';
 
 const modeStyles = {
@@ -10,7 +10,7 @@ const modeStyles = {
     button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
     title: 'Add stock',
     actionLabel: 'Add Stock',
-    helperPrefix: 'How many units do you want to add?',
+    helperAction: 'add',
   },
   decrease: {
     icon: ArrowDown,
@@ -20,7 +20,7 @@ const modeStyles = {
     button: 'bg-rose-600 hover:bg-rose-700 text-white',
     title: 'Deduct stock',
     actionLabel: 'Deduct Stock',
-    helperPrefix: 'How many units do you want to remove?',
+    helperAction: 'remove',
   },
 };
 
@@ -31,10 +31,12 @@ export default function StockAdjustModal({
   quantity = '',
   expirationDate = '',
   batchCost = '',
+  deductionMode = 'manual',
   isBusy = false,
   onQuantityChange,
   onExpirationDateChange,
   onBatchCostChange,
+  onDeductionModeChange,
   onCancel,
   onConfirm,
 }) {
@@ -47,8 +49,12 @@ export default function StockAdjustModal({
   const maxRemovable = Number(item.quantity || 0);
   const stockPreview = summarizeInventoryAfterAddition(item, quantity, expirationDate);
   const hasExpiredStock = stockPreview.hasExpiredStock;
-  const showAddPreview = mode === 'increase' && hasExpiredStock && stockPreview.addedQuantity > 0;
-  const isDecreaseModeWithExpired = mode === 'decrease' && hasExpiredStock;
+  const autoExpiredQuantity = stockPreview.expiredQuantity;
+  const showDeductionModePicker = mode === 'decrease' && hasExpiredStock && autoExpiredQuantity > 0;
+  const isAutoDeductExpired = showDeductionModePicker && deductionMode === 'expired';
+  const displayQuantity = isAutoDeductExpired
+    ? formatModalQuantity(autoExpiredQuantity)
+    : quantity;
 
   return (
     <>
@@ -123,23 +129,51 @@ export default function StockAdjustModal({
                 </div>
               )}
 
+              {showDeductionModePicker && (
+                <div className="mt-5">
+                  <p className="block text-xs font-bold uppercase tracking-widest text-[#A89080] mb-2">
+                    Deduction Method
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <DeductionModeButton
+                      active={deductionMode !== 'expired'}
+                      disabled={isBusy}
+                      icon={Edit2}
+                      label="Manual"
+                      detail="Type amount"
+                      onClick={() => onDeductionModeChange?.('manual')}
+                    />
+                    <DeductionModeButton
+                      active={deductionMode === 'expired'}
+                      disabled={isBusy}
+                      icon={Sparkles}
+                      label="All expired"
+                      detail={`${formatModalQuantity(autoExpiredQuantity)} ${unitLabel}`}
+                      onClick={() => onDeductionModeChange?.('expired')}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="mt-5">
                 <label htmlFor="stock-adjust-quantity" className="block text-xs font-bold uppercase tracking-widest text-[#A89080] mb-2">
-                  Quantity
+                  {unitLabel}
                 </label>
                 <input
                   id="stock-adjust-quantity"
                   type="number"
+                  aria-label={`Quantity in ${unitLabel}`}
                   min={supportsFractionalUnit ? '0.001' : '1'}
                   step={supportsFractionalUnit ? '0.001' : '1'}
                   autoFocus
-                  value={quantity}
+                  value={displayQuantity}
+                  disabled={isAutoDeductExpired || isBusy}
                   onChange={(event) => onQuantityChange?.(event.target.value)}
-                  className="w-full border border-[#E2DDD8] rounded-xl px-3.5 py-2.5 text-sm text-[#2C1810] bg-white transition focus:outline-none focus:border-[#6B3E26] focus:ring-2 focus:ring-[#6B3E26]/10 placeholder:text-[#C4B8B0]"
+                  className="w-full border border-[#E2DDD8] rounded-xl px-3.5 py-2.5 text-sm text-[#2C1810] bg-white transition focus:outline-none focus:border-[#6B3E26] focus:ring-2 focus:ring-[#6B3E26]/10 placeholder:text-[#C4B8B0] disabled:bg-[#F6F1EC] disabled:text-[#7A6355] disabled:cursor-not-allowed"
                   placeholder={`Enter number of ${unitLabel}`}
                 />
                 <p className="mt-2 text-xs text-[#8A7666]">
-                  {styles.helperPrefix}
+                  {isAutoDeductExpired ? 'All expired stock will be deducted.' : `Enter the amount in ${unitLabel} to ${styles.helperAction}.`}
                   {mode === 'decrease' ? ` Maximum removable: ${maxRemovable} ${unitLabel}.` : ''}
                 </p>
                 <p className="mt-1 text-[10px] text-[#9E8A7A]">
@@ -210,6 +244,40 @@ export default function StockAdjustModal({
         </div>
       </div>
     </>
+  );
+}
+
+function formatModalQuantity(value) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return String(value ?? '');
+  return Number.isInteger(numericValue)
+    ? String(numericValue)
+    : numericValue.toFixed(3).replace(/\.?0+$/, '');
+}
+
+function DeductionModeButton({ active, disabled, icon, label, detail, onClick }) {
+  const ModeIcon = icon;
+
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`flex min-h-[64px] items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition disabled:cursor-not-allowed disabled:opacity-60 ${
+        active
+          ? 'border-[#6B3E26] bg-[#F7EFE8] text-[#3D261D] shadow-sm'
+          : 'border-[#E2DDD8] bg-white text-[#7A6355] hover:border-[#CDBCAA] hover:bg-[#FBFAF8]'
+      }`}
+      aria-pressed={active}
+    >
+      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${active ? 'bg-white text-[#6B3E26]' : 'bg-[#F6F1EC] text-[#9E8A7A]'}`}>
+        <ModeIcon className="h-4 w-4" />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-sm font-semibold leading-tight">{label}</span>
+        <span className="mt-1 block truncate text-[11px] font-medium opacity-75">{detail}</span>
+      </span>
+    </button>
   );
 }
 

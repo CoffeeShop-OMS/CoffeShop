@@ -242,8 +242,11 @@ const consumeStockBatches = (item = {}, deductionQuantity) => {
       consumedBatches.push({
         id: batch.id,
         quantity: consumedQuantity,
+        previousQuantity: batch.quantity,
+        remainingQuantity,
         expirationDate: batch.expirationDate,
         receivedAt: batch.receivedAt,
+        ...(batch.cost !== undefined ? { cost: batch.cost } : {}),
         isExpired: isExpired,
       });
     }

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   AlertTriangle,
   ArrowDownLeft,
@@ -8,6 +8,7 @@ import {
   PackageSearch,
   RefreshCcw,
   Search,
+  X,
 } from 'lucide-react';
 import Dropdown from '../Dropdown';
 
@@ -68,16 +69,85 @@ const getBatchSummary = (entry) => {
   }
 
   if (entry.consumedBatches?.length > 0) {
-    const expirations = entry.consumedBatches
-      .map((batch) => formatExpiration(batch.expirationDate))
-      .filter(Boolean);
+    const totalConsumed = entry.consumedBatches.reduce(
+      (sum, batch) => sum + Number(batch.quantity || 0),
+      0
+    );
     const batchLabel = `${entry.consumedBatches.length} batch${entry.consumedBatches.length === 1 ? '' : 'es'}`;
-    return expirations.length > 0
-      ? `Used oldest available stock from ${batchLabel} - ${expirations.join(', ')}`
-      : `Used oldest available stock from ${batchLabel}`;
+    return `Deducted ${formatQuantity(totalConsumed, entry.unit)} from ${batchLabel}`;
   }
 
   return 'Stock movement recorded from the available batches';
+};
+
+const hasNumericValue = (value) =>
+  value !== undefined && value !== null && Number.isFinite(Number(value));
+
+const getConsumedBatchDetails = (entry) => {
+  if (!entry || entry.direction !== 'OUT' || !Array.isArray(entry.consumedBatches)) return [];
+
+  return entry.consumedBatches.map((batch, index) => {
+    const previousQuantity = hasNumericValue(batch.previousQuantity)
+      ? Number(batch.previousQuantity)
+      : null;
+    const remainingQuantity = hasNumericValue(batch.remainingQuantity)
+      ? Number(batch.remainingQuantity)
+      : null;
+    const quantity = Number(batch.quantity || 0);
+    const quantityTrail =
+      previousQuantity !== null && remainingQuantity !== null
+        ? `${formatQuantity(previousQuantity, entry.unit)} -> ${formatQuantity(remainingQuantity, entry.unit)}`
+        : '';
+    const meta = [
+      batch.expirationDate ? `Expires ${formatExpiration(batch.expirationDate)}` : '',
+      batch.receivedAt ? `Received ${formatExpiration(batch.receivedAt)}` : '',
+      batch.isExpired ? 'Expired batch' : '',
+    ].filter(Boolean);
+
+    return {
+      key: batch.id || `${entry.id}-batch-${index}`,
+      batchLabel: `Batch ${index + 1}`,
+      deductedLabel: `Deducted ${formatQuantity(quantity, entry.unit)}`,
+      quantityTrail,
+      meta,
+    };
+  });
+};
+
+const ConsumedBatchDetails = ({ batchDetails }) => {
+  if (batchDetails.length === 0) return null;
+
+  return (
+    <div className="space-y-2">
+      {batchDetails.map((batch) => (
+        <div key={batch.key} className="rounded-xl border border-[#EEE5DB] bg-[#FCFAF8] px-3.5 py-3">
+          <p className="text-sm font-semibold text-[#2C1810]">{batch.batchLabel}</p>
+          <p className="mt-1 text-xs text-rose-700 font-semibold">
+            {batch.deductedLabel}
+            {batch.quantityTrail ? ` - ${batch.quantityTrail}` : ''}
+          </p>
+          {batch.meta.length > 0 ? (
+            <p className="mt-1 text-[11px] text-[#9E8A7A]">{batch.meta.join(' - ')}</p>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const BatchDetailsButton = ({ entry, onClick }) => {
+  const batchCount = getConsumedBatchDetails(entry).length;
+  if (batchCount === 0) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mt-2 inline-flex items-center text-xs font-semibold text-[#6B3E26] hover:text-[#2E1C15] underline underline-offset-2"
+    >
+      View batches
+    </button>
+  );
 };
 
 const summaryCardBase =
@@ -99,6 +169,8 @@ export default function InventoryHistoryPanel({
   onLoadMore,
   hasMore = false,
 }) {
+  const [batchModalEntry, setBatchModalEntry] = useState(null);
+
   const summary = useMemo(() => {
     return entries.reduce(
       (acc, entry) => {
@@ -131,7 +203,40 @@ export default function InventoryHistoryPanel({
     { value: 'EXPIRED', label: 'Expired Only' },
   ];
 
+  const batchModalDetails = useMemo(
+    () => getConsumedBatchDetails(batchModalEntry),
+    [batchModalEntry]
+  );
+
   return (
+    <>
+    {batchModalEntry ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4 py-6 backdrop-blur-sm">
+        <div className="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-xl border border-[#EAE5E0]">
+          <div className="flex items-start justify-between gap-4 border-b border-[#F0EDE8] px-5 py-4">
+            <div>
+              <h3 className="text-sm font-bold text-[#1C100A]">Consumed Batches</h3>
+              <p className="mt-1 text-xs text-[#9E8A7A]">
+                {batchModalEntry.itemName} - {formatTimestamp(batchModalEntry.timestamp)}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setBatchModalEntry(null)}
+              className="rounded-full p-1.5 text-[#9E8A7A] hover:bg-[#F8F4EF] hover:text-[#2C1810] transition-colors"
+              aria-label="Close batch details"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+            <p className="mb-3 text-sm text-[#4B3429]">{getBatchSummary(batchModalEntry)}</p>
+            <ConsumedBatchDetails batchDetails={batchModalDetails} />
+          </div>
+        </div>
+      </div>
+    ) : null}
+
     <div className="bg-white rounded-2xl border border-[#EAE5E0] shadow-sm overflow-hidden">
       <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-[#F0EDE8] bg-[#FDFCFB] flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -295,6 +400,7 @@ export default function InventoryHistoryPanel({
                           <Layers3 className="w-4 h-4 text-[#A89080] mt-0.5 shrink-0" />
                           <div>
                             <p className="text-sm text-[#4B3429]">{getBatchSummary(entry)}</p>
+                            <BatchDetailsButton entry={entry} onClick={() => setBatchModalEntry(entry)} />
                             {entry.expirationDate ? (
                               <p className="text-xs text-[#9E8A7A] mt-1">
                                 Current expiry: {formatExpiration(entry.expirationDate)}
@@ -364,6 +470,7 @@ export default function InventoryHistoryPanel({
                   <div className="rounded-xl border border-[#EEE5DB] bg-[#FCFAF8] px-3.5 py-3">
                     <p className="text-[10px] uppercase tracking-widest text-[#A89080] font-bold">Batch Details</p>
                     <p className="mt-1 text-sm text-[#4B3429]">{getBatchSummary(entry)}</p>
+                    <BatchDetailsButton entry={entry} onClick={() => setBatchModalEntry(entry)} />
                     {entry.expirationDate ? (
                       <p className="text-xs text-[#9E8A7A] mt-1">Current expiry: {formatExpiration(entry.expirationDate)}</p>
                     ) : null}
@@ -406,5 +513,6 @@ export default function InventoryHistoryPanel({
         </div>
       ) : null}
     </div>
+    </>
   );
 }
